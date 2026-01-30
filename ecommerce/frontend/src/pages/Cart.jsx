@@ -67,14 +67,14 @@ const Cart = () => {
                 </div>
 
                 <div className="item-quantity">
-                  <button 
+                  <button
                     className="qty-btn"
                     onClick={() => updateQuantity(item._id, item.quantity - 1)}
                   >
                     <FiMinus />
                   </button>
                   <span className="qty-value">{item.quantity}</span>
-                  <button 
+                  <button
                     className="qty-btn"
                     onClick={() => updateQuantity(item._id, item.quantity + 1)}
                   >
@@ -86,7 +86,7 @@ const Cart = () => {
                   ${(item.price * item.quantity).toFixed(2)}
                 </div>
 
-                <button 
+                <button
                   className="remove-btn"
                   onClick={() => removeFromCart(item._id)}
                 >
@@ -107,12 +107,12 @@ const Cart = () => {
 
           <div className="cart-summary">
             <h3>Order Summary</h3>
-            
+
             <div className="summary-row">
               <span>Subtotal</span>
               <span>${subtotal.toFixed(2)}</span>
             </div>
-            
+
             <div className="summary-row">
               <span>Shipping</span>
               <span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
@@ -123,9 +123,9 @@ const Cart = () => {
                 Add ${(100 - subtotal).toFixed(2)} more for free shipping!
               </div>
             )}
-            
+
             <div className="summary-divider"></div>
-            
+
             <div className="summary-row total">
               <span>Total</span>
               <span>${total.toFixed(2)}</span>
