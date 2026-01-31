@@ -81,8 +81,7 @@ const Home = () => {
               Explore Our <span className="highlight">Modern Furniture</span> Collection
             </h1>
             <p className="hero-description">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
-              sed do eiusmod tempor incididunt ut labore et dolore.
+              buy great products
             </p>
             <div className="hero-actions">
               <Link to="/products" className="btn btn-primary">
@@ -170,7 +169,7 @@ const Home = () => {
             <div className="category-content">
               <span className="item-count"><span className="count-number">1500+</span> Items</span>
               <h2 className="category-title">Chairs</h2>
-              <p className="category-desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit</p>
+              <p className="category-desc">productssss</p>
               <ul className="category-list">
                 {chairTypes.map((type, index) => (
                   <li key={index}><Link to="/products">{type}</Link></li>
