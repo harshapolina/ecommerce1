@@ -238,6 +238,165 @@
   color: var(--text-secondary);
 }
 
+/* Ordered Tab */
+.ordered-tab {
+  position: fixed;
+  top: 120px;
+  right: 20px;
+  background: #fff9e6;
+  border: 2.5px solid #ff6b6b;
+  border-radius: 12px;
+  padding: 18px 28px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), 
+              0 2px 4px rgba(0, 0, 0, 0.1),
+              inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  z-index: 1000;
+  animation: slideInRight 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), 
+             writeAnimation 1.8s ease-out 0.6s,
+             slightWobble 3s ease-in-out 2.4s infinite;
+  transform-origin: right center;
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 107, 107, 0.03) 2px,
+      rgba(255, 107, 107, 0.03) 4px
+    );
+}
+
+.ordered-text {
+  font-family: 'Kalam', 'Comic Sans MS', 'Marker Felt', cursive;
+  font-size: 32px;
+  font-weight: 700;
+  color: #ff6b6b;
+  display: inline-block;
+  transform: rotate(-3deg);
+  text-shadow: 
+    2px 2px 0px rgba(0, 0, 0, 0.1),
+    1px 1px 2px rgba(255, 107, 107, 0.3),
+    0 0 8px rgba(255, 107, 107, 0.2);
+  letter-spacing: 2px;
+  position: relative;
+  animation: textWrite 1.5s ease-out 0.6s;
+  filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.15));
+}
+
+.ordered-text::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(
+    45deg, 
+    transparent 30%, 
+    rgba(255, 107, 107, 0.15) 50%, 
+    transparent 70%
+  );
+  animation: shimmer 3s infinite;
+  border-radius: 4px;
+}
+
+.ordered-text::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 10%;
+  width: 80%;
+  height: 3px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 107, 107, 0.4),
+    transparent
+  );
+  transform: rotate(-1deg);
+  animation: underlineDraw 0.8s ease-out 1.8s;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px) rotate(-5deg);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) rotate(-3deg);
+    opacity: 1;
+  }
+}
+
+@keyframes writeAnimation {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) rotate(-5deg);
+  }
+  50% {
+    transform: scale(1.08) rotate(-2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-3deg);
+  }
+}
+
+@keyframes textWrite {
+  0% {
+    opacity: 0;
+    letter-spacing: 8px;
+    transform: rotate(-5deg) scale(0.8);
+  }
+  60% {
+    letter-spacing: 3px;
+    transform: rotate(-2deg) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    letter-spacing: 2px;
+    transform: rotate(-3deg) scale(1);
+  }
+}
+
+@keyframes slightWobble {
+  0%, 100% {
+    transform: rotate(-3deg) translateX(0);
+  }
+  25% {
+    transform: rotate(-2.5deg) translateX(1px);
+  }
+  75% {
+    transform: rotate(-3.5deg) translateX(-1px);
+  }
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  50% {
+    opacity: 0.4;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes underlineDraw {
+  0% {
+    width: 0;
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    width: 80%;
+    opacity: 0.4;
+  }
+}
+
 /* Empty Cart */
 .empty-cart {
   text-align: center;

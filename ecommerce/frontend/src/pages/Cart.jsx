@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FiMinus, FiPlus, FiTrash2, FiArrowLeft, FiShoppingBag } from 'react-icons/fi';
 import { CartContext } from '../App';
@@ -6,6 +6,7 @@ import './Cart.css';
 
 const Cart = () => {
   const { cartItems, removeFromCart, updateQuantity, clearCart } = useContext(CartContext);
+  const [isOrdered, setIsOrdered] = useState(false);
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const shipping = subtotal > 100 ? 0 : 10;
@@ -131,9 +132,18 @@ const Cart = () => {
               <span>${total.toFixed(2)}</span>
             </div>
 
-            <button className="btn btn-primary checkout-btn">
-              Proceed to Checkout
+            <button 
+              className="btn btn-primary checkout-btn"
+              onClick={() => setIsOrdered(true)}
+            >
+              Proceed to Shop
             </button>
+
+            {isOrdered && (
+              <div className="ordered-tab">
+                <span className="ordered-text">Ordered</span>
+              </div>
+            )}
 
             <div className="payment-methods">
               <p>We accept:</p>
