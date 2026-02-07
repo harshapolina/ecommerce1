@@ -8,13 +8,24 @@ import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Categories from './pages/Categories';
+import About from './pages/About';
+import Blog from './pages/Blog';
+import Wishlist from './pages/Wishlist';
+import Profile from './pages/Profile';
 
 export const CartContext = createContext();
 export const AuthContext = createContext();
+export const WishlistContext = createContext();
 
 function App() {
   const [cartItems, setCartItems] = useState(() => {
     const saved = localStorage.getItem('cart');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [wishlistItems, setWishlistItems] = useState(() => {
+    const saved = localStorage.getItem('wishlist');
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -26,6 +37,10 @@ function App() {
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cartItems));
   }, [cartItems]);
+
+  useEffect(() => {
+    localStorage.setItem('wishlist', JSON.stringify(wishlistItems));
+  }, [wishlistItems]);
 
   useEffect(() => {
     if (user) {
@@ -69,13 +84,26 @@ function App() {
     setCartItems([]);
   };
 
+  const addToWishlist = (product) => {
+    setWishlistItems(prev => {
+      const exists = prev.find(item => item._id === product._id);
+      if (exists) return prev;
+      return [...prev, product];
+    });
+  };
+
+  const removeFromWishlist = (productId) => {
+    setWishlistItems(prev => prev.filter(item => item._id !== productId));
+  };
+
   const logout = () => {
     setUser(null);
   };
 
   return (
     <AuthContext.Provider value={{ user, setUser, logout }}>
-      <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, clearCart }}>
+      <WishlistContext.Provider value={{ wishlistItems, addToWishlist, removeFromWishlist }}>
+        <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, clearCart }}>
         <Toaster
           position="bottom-right"
           toastOptions={{
@@ -94,8 +122,14 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/categories" element={<Categories />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
-      </CartContext.Provider>
+        </CartContext.Provider>
+      </WishlistContext.Provider>
     </AuthContext.Provider>
   );
 }

@@ -1,18 +1,23 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useContext, useState, useEffect } from 'react';
-import { FiHeart, FiMaximize2, FiStar } from 'react-icons/fi';
-import { CartContext } from '../App';
+import { FiHeart, FiMaximize2, FiStar, FiPlus, FiMinus } from 'react-icons/fi';
+import { CartContext, WishlistContext } from '../App';
 import toast from 'react-hot-toast';
 import './ProductCard.css';
 
 const ProductCard = ({ product, showTimer = false }) => {
   const { addToCart } = useContext(CartContext);
+  const { wishlistItems, addToWishlist, removeFromWishlist } = useContext(WishlistContext);
+  const navigate = useNavigate();
+  const [quantity, setQuantity] = useState(1);
   const [timeLeft, setTimeLeft] = useState({
     days: 5,
     hours: 12,
     mins: 30,
     secs: 25
   });
+
+  const isInWishlist = wishlistItems.some(item => item._id === product._id);
 
   useEffect(() => {
     if (!showTimer) return;
@@ -50,8 +55,33 @@ const ProductCard = ({ product, showTimer = false }) => {
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    addToCart(product);
-    toast.success(`${product.name} added to cart`);
+    addToCart(product, quantity);
+    toast.success(`${quantity} x ${product.name} added to cart`);
+    navigate('/cart');
+  };
+
+  const handleWishlistToggle = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isInWishlist) {
+      removeFromWishlist(product._id);
+      toast.success('Removed from wishlist');
+    } else {
+      addToWishlist(product);
+      toast.success('Added to wishlist');
+    }
+  };
+
+  const incrementQuantity = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setQuantity(prev => Math.min(prev + 1, product.stock || 99));
+  };
+
+  const decrementQuantity = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setQuantity(prev => Math.max(prev - 1, 1));
   };
 
   const discount = product.originalPrice 
@@ -73,12 +103,19 @@ const ProductCard = ({ product, showTimer = false }) => {
           )}
 
           <div className="product-actions">
-            <button className="action-btn" onClick={(e) => e.preventDefault()}>
+            <button 
+              className={`action-btn ${isInWishlist ? 'active' : ''}`} 
+              onClick={handleWishlistToggle}
+            >
               <FiHeart />
             </button>
-            <button className="action-btn" onClick={(e) => e.preventDefault()}>
+            <Link 
+              to={`/products/${product._id}`}
+              className="action-btn"
+              onClick={(e) => e.stopPropagation()}
+            >
               <FiMaximize2 />
-            </button>
+            </Link>
           </div>
 
           {showTimer && (
@@ -123,6 +160,32 @@ const ProductCard = ({ product, showTimer = false }) => {
             <FiStar className="star-icon" />
             <span>{product.rating?.toFixed(1) || '4.5'}</span>
           </div>
+        </div>
+        
+        <div className="product-quantity-section">
+          <div className="quantity-selector-card">
+            <button 
+              className="qty-btn-card" 
+              onClick={decrementQuantity}
+              disabled={quantity <= 1}
+            >
+              <FiMinus />
+            </button>
+            <span className="qty-value-card">{quantity}</span>
+            <button 
+              className="qty-btn-card" 
+              onClick={incrementQuantity}
+              disabled={quantity >= (product.stock || 99)}
+            >
+              <FiPlus />
+            </button>
+          </div>
+          <button 
+            className="btn-add-to-cart-card"
+            onClick={handleAddToCart}
+          >
+            Add to Cart
+          </button>
         </div>
       </div>
     </div>

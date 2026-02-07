@@ -1,13 +1,14 @@
 import { useState, useContext, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FiMinus, FiPlus, FiHeart, FiShare2, FiTruck, FiShield, FiRefreshCw, FiStar } from 'react-icons/fi';
-import { CartContext } from '../App';
+import { CartContext, WishlistContext } from '../App';
 import toast from 'react-hot-toast';
 import './ProductDetails.css';
 
 const ProductDetails = () => {
   const { id } = useParams();
   const { addToCart } = useContext(CartContext);
+  const { wishlistItems, addToWishlist, removeFromWishlist } = useContext(WishlistContext);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -31,12 +32,26 @@ const ProductDetails = () => {
   }, [id]);
 
   const handleAddToCart = () => {
+    if (!product) return;
     addToCart(product, quantity);
     toast.success(`${product.name} added to cart`);
   };
 
+  const isInWishlist = product && wishlistItems.some(item => item._id === product._id);
+
+  const handleWishlistToggle = () => {
+    if (!product) return;
+    if (isInWishlist) {
+      removeFromWishlist(product._id);
+      toast.success('Removed from wishlist');
+    } else {
+      addToWishlist(product);
+      toast.success('Added to wishlist');
+    }
+  };
+
   const incrementQuantity = () => {
-    if (quantity < product.stock) {
+    if (product && quantity < product.stock) {
       setQuantity(q => q + 1);
     }
   };
@@ -151,7 +166,10 @@ const ProductDetails = () => {
               <button className="btn btn-primary add-to-cart-btn" onClick={handleAddToCart}>
                 Add to Cart
               </button>
-              <button className="wishlist-btn">
+              <button 
+                className={`wishlist-btn ${isInWishlist ? 'active' : ''}`}
+                onClick={handleWishlistToggle}
+              >
                 <FiHeart />
               </button>
               <button className="share-btn">

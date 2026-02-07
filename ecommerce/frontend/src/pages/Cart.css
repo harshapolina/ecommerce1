@@ -238,6 +238,26 @@
   color: var(--text-secondary);
 }
 
+.login-prompt {
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--primary-light);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.login-prompt p {
+  font-size: 14px;
+  color: var(--primary);
+  margin: 0;
+}
+
+.login-prompt a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
 /* Ordered Tab */
 .ordered-tab {
   position: fixed;

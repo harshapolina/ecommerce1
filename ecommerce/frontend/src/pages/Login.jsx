@@ -62,7 +62,13 @@ const Login = () => {
 
     } catch (error) {
       toast.dismiss(loadToast);
-      toast.error("Server error");
+      console.error("Login error:", error);
+      
+      if (error.name === "TypeError" && error.message.includes("fetch")) {
+        toast.error("Cannot connect to server. Please make sure the backend server is running on port 5000.");
+      } else {
+        toast.error(error.message || "Network error. Please check your connection and try again.");
+      }
       setLoading(false);
     }
   };

@@ -1,11 +1,14 @@
 import { useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiMinus, FiPlus, FiTrash2, FiArrowLeft, FiShoppingBag } from 'react-icons/fi';
-import { CartContext } from '../App';
+import { CartContext, AuthContext } from '../App';
+import toast from 'react-hot-toast';
 import './Cart.css';
 
 const Cart = () => {
   const { cartItems, removeFromCart, updateQuantity, clearCart } = useContext(CartContext);
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [isOrdered, setIsOrdered] = useState(false);
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
@@ -134,10 +137,48 @@ const Cart = () => {
 
             <button 
               className="btn btn-primary checkout-btn"
-              onClick={() => setIsOrdered(true)}
+              onClick={() => {
+                if (!user) {
+                  toast.error('Please login to place an order');
+                  navigate('/login');
+                  return;
+                }
+                
+                // Save order to localStorage
+                const order = {
+                  orderId: `ORD-${Date.now()}`,
+                  date: new Date().toISOString(),
+                  items: cartItems,
+                  total: total,
+                  subtotal: subtotal,
+                  shipping: shipping,
+                  status: 'completed',
+                  userId: user._id || user.email
+                };
+                
+                const existingOrders = localStorage.getItem(`orders_${user._id || user.email}`);
+                const orders = existingOrders ? JSON.parse(existingOrders) : [];
+                orders.unshift(order);
+                localStorage.setItem(`orders_${user._id || user.email}`, JSON.stringify(orders));
+                
+                setIsOrdered(true);
+                toast.success('Order placed successfully!');
+                clearCart();
+                
+                // Navigate to profile after a delay
+                setTimeout(() => {
+                  navigate('/profile');
+                }, 2000);
+              }}
             >
               Proceed to Shop
             </button>
+
+            {!user && (
+              <div className="login-prompt">
+                <p>Please <Link to="/login">login</Link> to place an order</p>
+              </div>
+            )}
 
             {isOrdered && (
               <div className="ordered-tab">

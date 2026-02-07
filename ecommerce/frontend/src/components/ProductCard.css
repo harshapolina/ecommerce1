@@ -3,6 +3,11 @@
   border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s ease;
+  position: relative;
+}
+
+.product-card .product-info {
+  overflow: visible;
 }
 
 .product-card:hover {
@@ -81,6 +86,15 @@
   color: var(--white);
 }
 
+.action-btn.active {
+  background: var(--primary);
+  color: var(--white);
+}
+
+.action-btn.active svg {
+  fill: var(--white);
+}
+
 /* Countdown Timer */
 .countdown-timer {
   position: absolute;
@@ -125,6 +139,9 @@
 /* Product Info */
 .product-info {
   padding: 16px 8px;
+  position: relative;
+  z-index: 1;
+  background: var(--white);
 }
 
 .product-category {
@@ -185,4 +202,101 @@
   color: var(--accent);
   fill: var(--accent);
   font-size: 14px;
+}
+
+.product-quantity-section {
+  padding: 12px 8px 16px;
+  border-top: 1px solid var(--border);
+  margin-top: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+  background: var(--white);
+  overflow: visible;
+}
+
+.quantity-selector-card {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-secondary);
+}
+
+.qty-btn-card {
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.qty-btn-card:hover:not(:disabled) {
+  background: var(--primary);
+  color: var(--white);
+}
+
+.qty-btn-card:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.qty-value-card {
+  width: 40px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.btn-add-to-cart-card {
+  flex: 1;
+  height: 36px;
+  background: var(--primary);
+  color: var(--white) !important;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 10;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.btn-add-to-cart-card:hover {
+  background: var(--primary) !important;
+  transform: none;
+  opacity: 1 !important;
+  visibility: visible !important;
+  color: var(--white) !important;
+}
+
+.btn-add-to-cart-card:active {
+  transform: translateY(0);
+  opacity: 1 !important;
+  visibility: visible !important;
+  color: var(--white) !important;
+}
+
+.btn-add-to-cart-card:focus {
+  opacity: 1 !important;
+  visibility: visible !important;
+  color: var(--white) !important;
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }

@@ -2,16 +2,18 @@ import { Link, useLocation } from 'react-router-dom';
 import { useContext, useState } from 'react';
 import { FiShoppingCart, FiUser, FiSearch, FiHeart, FiPhone, FiMenu, FiX } from 'react-icons/fi';
 import { FaFacebookF, FaTwitter, FaInstagram, FaYoutube } from 'react-icons/fa';
-import { CartContext, AuthContext } from '../App';
+import { CartContext, AuthContext, WishlistContext } from '../App';
 import './Navbar.css';
 
 const Navbar = () => {
   const { cartItems } = useContext(CartContext);
+  const { wishlistItems } = useContext(WishlistContext);
   const { user, logout } = useContext(AuthContext);
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const wishlistCount = wishlistItems.length;
 
   return (
     <>
@@ -60,16 +62,25 @@ const Navbar = () => {
             >
               Shop
             </Link>
-            <Link to="/products" className="nav-link" onClick={() => setMobileMenuOpen(false)}>
+            <Link 
+              to="/categories" 
+              className={`nav-link ${location.pathname === '/categories' ? 'active' : ''}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
               Categories
             </Link>
-            <Link to="/" className="nav-link" onClick={() => setMobileMenuOpen(false)}>
+            <Link 
+              to="/about" 
+              className={`nav-link ${location.pathname === '/about' ? 'active' : ''}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
               About Us
             </Link>
-            <Link to="/" className="nav-link" onClick={() => setMobileMenuOpen(false)}>
-              Contact Us
-            </Link>
-            <Link to="/" className="nav-link" onClick={() => setMobileMenuOpen(false)}>
+            <Link 
+              to="/blog" 
+              className={`nav-link ${location.pathname === '/blog' ? 'active' : ''}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
               Blog
             </Link>
           </div>
@@ -78,19 +89,18 @@ const Navbar = () => {
             <button className="nav-icon">
               <FiSearch />
             </button>
-            <button className="nav-icon">
+            <Link to="/wishlist" className="nav-icon wishlist-btn">
               <FiHeart />
-            </button>
+              {wishlistCount > 0 && <span className="cart-badge">{wishlistCount}</span>}
+            </Link>
             <Link to="/cart" className="nav-icon cart-btn">
               <FiShoppingCart />
               {totalItems > 0 && <span className="cart-badge">{totalItems}</span>}
             </Link>
             {user ? (
-              <div className="user-menu">
-                <button onClick={logout} className="nav-icon">
-                  <FiUser />
-                </button>
-              </div>
+              <Link to="/profile" className="nav-icon" title="Profile">
+                <FiUser />
+              </Link>
             ) : (
               <Link to="/login" className="nav-icon">
                 <FiUser />
