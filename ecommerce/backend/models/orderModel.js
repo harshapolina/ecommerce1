@@ -1,15 +1,12 @@
 import mongoose from 'mongoose';
 
-// Order schema to store order details in MongoDB
 const orderSchema = new mongoose.Schema({
-  // User who placed the order
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
   
-  // Order items with product details
   orderItems: [{
     name: { type: String, required: true },
     quantity: { type: Number, required: true },
@@ -22,7 +19,6 @@ const orderSchema = new mongoose.Schema({
     }
   }],
   
-  // Shipping address
   shippingAddress: {
     fullName: { type: String, required: true },
     address: { type: String, required: true },
@@ -32,14 +28,12 @@ const orderSchema = new mongoose.Schema({
     phone: { type: String, required: true }
   },
   
-  // Payment information
   paymentMethod: {
     type: String,
     required: true,
     default: 'Razorpay'
   },
   
-  // Razorpay payment details
   razorpayOrderId: {
     type: String,
     required: true
@@ -53,7 +47,6 @@ const orderSchema = new mongoose.Schema({
     type: String
   },
   
-  // Pricing breakdown
   itemsPrice: {
     type: Number,
     required: true,
@@ -72,7 +65,6 @@ const orderSchema = new mongoose.Schema({
     default: 0.0
   },
   
-  // Order status
   isPaid: {
     type: Boolean,
     required: true,

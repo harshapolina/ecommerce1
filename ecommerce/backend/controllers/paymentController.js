@@ -2,18 +2,15 @@ import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import Order from '../models/orderModel.js';
 
-// Initialize Razorpay instance with key and secret
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET
 });
 
-// Create Razorpay order
 export const createOrder = async (req, res) => {
   try {
     const { amount, currency = 'INR', items, shippingAddress } = req.body;
     
-    // Validate required fields
     if (!amount || !items || items.length === 0) {
       return res.status(400).json({ 
         success: false,
@@ -21,12 +18,9 @@ export const createOrder = async (req, res) => {
       });
     }
     
-    // Convert amount to paise (Razorpay expects amount in smallest currency unit)
-    // For INR, 1 rupee = 100 paise
     const amountInPaise = Math.round(amount * 100);
     
-    // Create order options for Razorpay
-    const options = {
+    const orderOptions = {
       amount: amountInPaise,
       currency: currency,
       receipt: `receipt_${Date.now()}`,
@@ -36,11 +30,9 @@ export const createOrder = async (req, res) => {
       }
     };
     
-    // Create order in Razorpay
-    const razorpayOrder = await razorpay.orders.create(options);
+    const razorpayOrder = await razorpay.orders.create(orderOptions);
     
-    // Save order to database with pending status
-    const order = new Order({
+    const newOrder = new Order({
       user: req.user._id,
       orderItems: items.map(item => ({
         name: item.name,
@@ -64,9 +56,8 @@ export const createOrder = async (req, res) => {
       isPaid: false
     });
     
-    await order.save();
+    await newOrder.save();
     
-    // Return order details to frontend
     res.status(200).json({
       success: true,
       order: {
@@ -75,33 +66,29 @@ export const createOrder = async (req, res) => {
         currency: razorpayOrder.currency,
         receipt: razorpayOrder.receipt
       },
-      orderId: order._id
+      orderId: newOrder._id
     });
     
   } catch (error) {
-    console.error('Error creating Razorpay order:', error);
+    console.error(error);
     res.status(500).json({
       success: false,
-      message: 'Failed to create order',
-      error: error.message
+      message: 'Failed to create order'
     });
   }
 };
 
-// Verify payment and update order
 export const verifyPayment = async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, orderId } = req.body;
     
-    // Validate required fields
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !orderId) {
       return res.status(400).json({
         success: false,
-        message: 'Payment verification data is missing'
+        message: 'Payment data missing'
       });
     }
     
-    // Find the order in database
     const order = await Order.findById(orderId);
     
     if (!order) {
@@ -111,25 +98,19 @@ export const verifyPayment = async (req, res) => {
       });
     }
     
-    // Verify the payment signature
-    // Razorpay sends a signature that we need to verify using our secret
     const text = `${razorpay_order_id}|${razorpay_payment_id}`;
-    const generatedSignature = crypto
+    const generatedSig = crypto
       .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
       .update(text)
       .digest('hex');
     
-    // Compare signatures
-    const isSignatureValid = generatedSignature === razorpay_signature;
-    
-    if (!isSignatureValid) {
+    if (generatedSig !== razorpay_signature) {
       return res.status(400).json({
         success: false,
-        message: 'Payment verification failed - Invalid signature'
+        message: 'Invalid signature'
       });
     }
     
-    // Update order with payment details
     order.razorpayPaymentId = razorpay_payment_id;
     order.razorpaySignature = razorpay_signature;
     order.isPaid = true;
@@ -137,10 +118,9 @@ export const verifyPayment = async (req, res) => {
     
     await order.save();
     
-    // Return success response
     res.status(200).json({
       success: true,
-      message: 'Payment verified successfully',
+      message: 'Payment verified',
       order: {
         _id: order._id,
         totalPrice: order.totalPrice,
@@ -150,16 +130,14 @@ export const verifyPayment = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Error verifying payment:', error);
+    console.error(error);
     res.status(500).json({
       success: false,
-      message: 'Payment verification failed',
-      error: error.message
+      message: 'Verification failed'
     });
   }
 };
 
-// Get user orders
 export const getUserOrders = async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user._id })
@@ -171,11 +149,10 @@ export const getUserOrders = async (req, res) => {
       orders
     });
   } catch (error) {
-    console.error('Error fetching orders:', error);
+    console.error(error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch orders',
-      error: error.message
+      message: 'Failed to fetch orders'
     });
   }
 };

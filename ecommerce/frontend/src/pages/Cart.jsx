@@ -5,7 +5,6 @@ import { CartContext, AuthContext } from '../App';
 import toast from 'react-hot-toast';
 import './Cart.css';
 
-// Load Razorpay script
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
     const script = document.createElement('script');
@@ -27,16 +26,13 @@ const Cart = () => {
   const total = subtotal + shipping;
   const [processing, setProcessing] = useState(false);
 
-  // Handle checkout and Razorpay payment
   const handleCheckout = async () => {
-    // Check if user is logged in
     if (!user) {
       toast.error('Please login to place an order');
       navigate('/login');
       return;
     }
 
-    // Check if cart has items
     if (cartItems.length === 0) {
       toast.error('Your cart is empty');
       return;
@@ -46,7 +42,6 @@ const Cart = () => {
     setIsOrdered(true);
 
     try {
-      // Load Razorpay script
       const razorpayLoaded = await loadRazorpayScript();
       
       if (!razorpayLoaded) {
@@ -56,7 +51,6 @@ const Cart = () => {
         return;
       }
 
-      // Prepare order data
       const orderData = {
         amount: total,
         currency: 'INR',
@@ -77,8 +71,7 @@ const Cart = () => {
         }
       };
 
-      // Create order on backend
-      const createOrderResponse = await fetch('http://localhost:5000/api/payments/create-order', {
+      const res = await fetch('http://localhost:5000/api/payments/create-order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -87,24 +80,22 @@ const Cart = () => {
         body: JSON.stringify(orderData)
       });
 
-      const createOrderData = await createOrderResponse.json();
+      const data = await res.json();
 
-      if (!createOrderResponse.ok || !createOrderData.success) {
-        throw new Error(createOrderData.message || 'Failed to create order');
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Failed to create order');
       }
 
-      // Razorpay checkout options
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_1DP5mmOlF5G5ag', // Replace with your Razorpay key
-        amount: createOrderData.order.amount,
-        currency: createOrderData.order.currency,
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_1DP5mmOlF5G5ag',
+        amount: data.order.amount,
+        currency: data.order.currency,
         name: 'Furniture Store',
         description: `Order for ${cartItems.length} item(s)`,
-        order_id: createOrderData.order.id,
+        order_id: data.order.id,
         handler: async function (response) {
-          // Payment successful - verify payment on backend
           try {
-            const verifyResponse = await fetch('http://localhost:5000/api/payments/verify-payment', {
+            const verifyRes = await fetch('http://localhost:5000/api/payments/verify-payment', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -114,29 +105,25 @@ const Cart = () => {
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
-                orderId: createOrderData.orderId
+                orderId: data.orderId
               })
             });
 
-            const verifyData = await verifyResponse.json();
+            const verifyData = await verifyRes.json();
 
-            if (verifyResponse.ok && verifyData.success) {
-              // Payment verified successfully
+            if (verifyRes.ok && verifyData.success) {
               toast.success('Payment successful! Order placed.');
               clearCart();
-              
-              // Navigate to profile after a delay
               setTimeout(() => {
                 navigate('/profile');
               }, 2000);
             } else {
-              // Payment verification failed
               toast.error(verifyData.message || 'Payment verification failed');
               setIsOrdered(false);
             }
           } catch (error) {
-            console.error('Payment verification error:', error);
-            toast.error('Payment verification failed. Please contact support.');
+            console.error(error);
+            toast.error('Payment verification failed');
             setIsOrdered(false);
           } finally {
             setProcessing(false);
@@ -152,7 +139,6 @@ const Cart = () => {
         },
         modal: {
           ondismiss: function() {
-            // User closed the payment modal
             toast.error('Payment cancelled');
             setIsOrdered(false);
             setProcessing(false);
@@ -160,12 +146,11 @@ const Cart = () => {
         }
       };
 
-      // Open Razorpay checkout
       const razorpay = new window.Razorpay(options);
       razorpay.open();
 
     } catch (error) {
-      console.error('Checkout error:', error);
+      console.error(error);
       toast.error(error.message || 'Failed to process payment');
       setIsOrdered(false);
       setProcessing(false);

@@ -18,31 +18,28 @@ const Profile = () => {
       return;
     }
     
-    // Fetch orders from backend API
     const fetchOrders = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://localhost:5000/api/payments/orders', {
+        const res = await fetch('http://localhost:5000/api/payments/orders', {
           headers: {
             'Authorization': `Bearer ${user.token}`
           }
         });
         
-        if (response.ok) {
-          const data = await response.json();
+        if (res.ok) {
+          const data = await res.json();
           if (data.success) {
             setOrders(data.orders || []);
           }
         } else {
-          // Fallback to localStorage if API fails
           const savedOrders = localStorage.getItem(`orders_${user._id || user.email}`);
           if (savedOrders) {
             setOrders(JSON.parse(savedOrders));
           }
         }
       } catch (error) {
-        console.error('Error fetching orders:', error);
-        // Fallback to localStorage
+        console.error(error);
         const savedOrders = localStorage.getItem(`orders_${user._id || user.email}`);
         if (savedOrders) {
           setOrders(JSON.parse(savedOrders));
