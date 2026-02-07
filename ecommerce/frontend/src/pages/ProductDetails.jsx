@@ -145,9 +145,9 @@ const ProductDetails = () => {
             </div>
 
             <div className="product-price-section">
-              <span className="current-price">${product.price.toFixed(2)}</span>
+              <span className="current-price">₹{product.price.toFixed(2)}</span>
               {product.originalPrice && (
-                <span className="original-price">${product.originalPrice.toFixed(2)}</span>
+                <span className="original-price">₹{product.originalPrice.toFixed(2)}</span>
               )}
             </div>
 
@@ -190,7 +190,7 @@ const ProductDetails = () => {
                 <FiTruck className="feature-icon" />
                 <div>
                   <strong>Free Shipping</strong>
-                  <span>On orders over $100</span>
+                  <span>On orders over ₹100</span>
                 </div>
               </div>
               <div className="feature">
@@ -250,7 +250,7 @@ const ProductDetails = () => {
             {activeTab === 'shipping' && (
               <div className="tab-panel">
                 <h3>Shipping Information</h3>
-                <p>Free standard shipping on orders over $100. Express shipping available at checkout.</p>
+                <p>Free standard shipping on orders over ₹100. Express shipping available at checkout.</p>
                 <p>Delivery typically takes 5-7 business days.</p>
               </div>
             )}

@@ -8,7 +8,7 @@ const Home = () => {
   const [activeTab, setActiveTab] = useState('latest');
 
   const features = [
-    { icon: <FiTruck />, title: 'Free Shipping', desc: 'Free shipping for order above $180' },
+    { icon: <FiTruck />, title: 'Free Shipping', desc: 'Free shipping for order above ₹180' },
     { icon: <FiCreditCard />, title: 'Flexible Payment', desc: 'Multiple secure payment options' },
     { icon: <FiHeadphones />, title: '24×7 Support', desc: 'We support online all days.' },
   ];
@@ -111,7 +111,7 @@ const Home = () => {
                   src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800" 
                   alt="Living Room Furniture" 
                 />
-                <span className="price-tag">$1,500</span>
+                <span className="price-tag">₹1,500</span>
               </div>
               <div className="hero-category-cards">
                 <div className="category-card">

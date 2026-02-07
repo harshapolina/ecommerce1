@@ -253,6 +253,24 @@
   color: var(--text-secondary);
 }
 
+/* Load More */
+.load-more-container {
+  text-align: center;
+  margin-top: 40px;
+  padding: 30px 20px;
+}
+
+.load-more-btn {
+  min-width: 200px;
+  margin-bottom: 12px;
+}
+
+.load-more-info {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
 /* Responsive */
 @media (max-width: 992px) {
   .shop-layout {

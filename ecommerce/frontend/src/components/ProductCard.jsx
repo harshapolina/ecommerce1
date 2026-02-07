@@ -151,9 +151,9 @@ const ProductCard = ({ product, showTimer = false }) => {
         </Link>
         <div className="product-footer">
           <div className="product-price-wrapper">
-            <span className="product-price">${product.price.toFixed(2)}</span>
+            <span className="product-price">₹{product.price.toFixed(2)}</span>
             {product.originalPrice && (
-              <span className="original-price">${product.originalPrice.toFixed(2)}</span>
+              <span className="original-price">₹{product.originalPrice.toFixed(2)}</span>
             )}
           </div>
           <div className="product-rating">

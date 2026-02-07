@@ -17,11 +17,42 @@ const Profile = () => {
       navigate('/login');
       return;
     }
-    // Load user orders from localStorage or API
-    const savedOrders = localStorage.getItem(`orders_${user._id || user.email}`);
-    if (savedOrders) {
-      setOrders(JSON.parse(savedOrders));
-    }
+    
+    // Fetch orders from backend API
+    const fetchOrders = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch('http://localhost:5000/api/payments/orders', {
+          headers: {
+            'Authorization': `Bearer ${user.token}`
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setOrders(data.orders || []);
+          }
+        } else {
+          // Fallback to localStorage if API fails
+          const savedOrders = localStorage.getItem(`orders_${user._id || user.email}`);
+          if (savedOrders) {
+            setOrders(JSON.parse(savedOrders));
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+        // Fallback to localStorage
+        const savedOrders = localStorage.getItem(`orders_${user._id || user.email}`);
+        if (savedOrders) {
+          setOrders(JSON.parse(savedOrders));
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchOrders();
   }, [user, navigate]);
 
   const handleLogout = () => {
@@ -98,32 +129,38 @@ const Profile = () => {
               </h2>
             </div>
 
-            {orders.length > 0 ? (
+            {loading ? (
+              <div className="loading-state">
+                <p>Loading orders...</p>
+              </div>
+            ) : orders.length > 0 ? (
               <div className="orders-list">
-                {orders.map((order, index) => (
-                  <div key={index} className="order-card">
+                {orders.map((order) => (
+                  <div key={order._id || order.razorpayOrderId} className="order-card">
                     <div className="order-header">
                       <div>
-                        <h3>Order #{order.orderId || `ORD-${Date.now()}-${index + 1}`}</h3>
+                        <h3>Order #{order.razorpayOrderId || order._id}</h3>
                         <p className="order-date">
-                          {order.date || new Date().toLocaleDateString()}
+                          {order.createdAt 
+                            ? new Date(order.createdAt).toLocaleDateString() 
+                            : new Date().toLocaleDateString()}
                         </p>
                       </div>
-                      <span className={`order-status ${order.status || 'completed'}`}>
-                        {order.status || 'Completed'}
+                      <span className={`order-status ${order.isPaid ? 'paid' : 'pending'}`}>
+                        {order.isPaid ? 'Paid' : 'Pending'}
                       </span>
                     </div>
 
                     <div className="order-items">
-                      {order.items?.map((item, idx) => (
+                      {order.orderItems?.map((item, idx) => (
                         <div key={idx} className="order-item">
                           <img src={item.image} alt={item.name} />
                           <div className="order-item-details">
                             <h4>{item.name}</h4>
-                            <p>Quantity: {item.quantity} × ${item.price.toFixed(2)}</p>
+                            <p>Quantity: {item.quantity} × ₹{item.price.toFixed(2)}</p>
                           </div>
                           <span className="order-item-total">
-                            ${(item.price * item.quantity).toFixed(2)}
+                            ₹{(item.price * item.quantity).toFixed(2)}
                           </span>
                         </div>
                       ))}
@@ -132,8 +169,13 @@ const Profile = () => {
                     <div className="order-footer">
                       <div className="order-total">
                         <span>Total:</span>
-                        <strong>${order.total?.toFixed(2) || '0.00'}</strong>
+                        <strong>₹{order.totalPrice?.toFixed(2) || '0.00'}</strong>
                       </div>
+                      {order.isPaid && order.paidAt && (
+                        <p className="paid-date">
+                          Paid on: {new Date(order.paidAt).toLocaleDateString()}
+                        </p>
+                      )}
                     </div>
                   </div>
                 ))}
