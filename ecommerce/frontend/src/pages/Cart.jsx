@@ -51,74 +51,52 @@ const Cart = () => {
         return;
       }
 
-      const orderData = {
-        amount: total,
-        currency: 'INR',
-        items: cartItems.map(item => ({
-          _id: item._id,
-          name: item.name,
-          quantity: item.quantity,
-          price: item.price,
-          image: item.image
-        })),
-        shippingAddress: {
-          fullName: user.name,
-          address: 'Not provided',
-          city: 'Not provided',
-          postalCode: '000000',
-          country: 'India',
-          phone: '0000000000'
-        }
-      };
-
       const res = await fetch('http://localhost:5000/api/payments/create-order', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.token}`
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(orderData)
+        body: JSON.stringify({ amount: total })
       });
 
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || 'Failed to create order');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to create order');
       }
 
+      const order = await res.json();
+
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_1DP5mmOlF5G5ag',
-        amount: data.order.amount,
-        currency: data.order.currency,
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_SBjgUiAL2qDOF8',
+        amount: order.amount,
+        currency: order.currency,
         name: 'Furniture Store',
         description: `Order for ${cartItems.length} item(s)`,
-        order_id: data.order.id,
+        order_id: order.id,
         handler: async function (response) {
           try {
             const verifyRes = await fetch('http://localhost:5000/api/payments/verify-payment', {
               method: 'POST',
               headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${user.token}`
+                'Content-Type': 'application/json'
               },
               body: JSON.stringify({
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-                orderId: data.orderId
+                razorpay_signature: response.razorpay_signature
               })
             });
 
             const verifyData = await verifyRes.json();
 
-            if (verifyRes.ok && verifyData.success) {
+            if (verifyData.success) {
               toast.success('Payment successful! Order placed.');
               clearCart();
               setTimeout(() => {
                 navigate('/profile');
               }, 2000);
             } else {
-              toast.error(verifyData.message || 'Payment verification failed');
+              toast.error('Payment verification failed');
               setIsOrdered(false);
             }
           } catch (error) {

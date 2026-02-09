@@ -25,8 +25,14 @@ const Navbar = () => {
             <span>Call Us : +123-456-789</span>
           </div>
           <div className="top-bar-center">
-            <span>Sign up and <strong>GET 25% OFF</strong> for your first order. </span>
-            <Link to="/signup" className="signup-link">Sign up now</Link>
+            {!user ? (
+              <>
+                <span>Sign up and <strong>GET 25% OFF</strong> for your first order. </span>
+                <Link to="/signup" className="signup-link">Sign up now</Link>
+              </>
+            ) : (
+              <span>Welcome back, {user.name || 'User'}! 🎉</span>
+            )}
           </div>
           <div className="top-bar-right">
             <a href="#" className="social-icon"><FaFacebookF /></a>
