@@ -1,6 +1,5 @@
 import Product from "../models/productModel.js";
 
-// Get all products
 const getProducts = async (req, res) => {
   try {
     const { category, search } = req.query;
@@ -24,7 +23,6 @@ const getProducts = async (req, res) => {
   }
 };
 
-// Get product by ID
 const getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -40,7 +38,6 @@ const getProductById = async (req, res) => {
   }
 };
 
-// Create a new product
 const createProduct = async (req, res) => {
   try {
     const { name, description, price, image, category, stock } = req.body;
@@ -61,7 +58,6 @@ const createProduct = async (req, res) => {
   }
 };
 
-// Update product
 const updateProduct = async (req, res) => {
   try {
     const updates = req.body;
@@ -72,15 +68,7 @@ const updateProduct = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // Update only passed fields
     Object.assign(product, updates);
-    // product.name = req.body.name || product.name;
-    // product.description = req.body.description || product.description;
-    // product.price = req.body.price || product.price;
-    // product.image = req.body.image || product.image;
-    // product.category = req.body.category || product.category;
-    // product.stock = req.body.stock || product.stock;
-
     const updatedProduct = await product.save();
     res.json(updatedProduct);
 
@@ -89,7 +77,6 @@ const updateProduct = async (req, res) => {
   }
 };
 
-// Delete product
 const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -106,8 +93,7 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-// Export all controllers 
-export  {
+export {
   getProducts,
   getProductById,
   createProduct,

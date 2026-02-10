@@ -15,7 +15,6 @@ const ProductDetails = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [activeTab, setActiveTab] = useState('description');
 
-  // Mock product data
   const mockProducts = {
     '1': { _id: '1', name: 'Wooden Sofa Chair', category: 'Chair', price: 80.00, originalPrice: 160.00, image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800', rating: 4.9, stock: 15, description: 'A beautiful wooden sofa chair perfect for your living room. Made with premium quality wood and comfortable cushioning.' },
     '2': { _id: '2', name: 'Circular Sofa Chair', category: 'Chair', price: 108.00, originalPrice: 120.00, image: 'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=800', rating: 5.0, stock: 10, description: 'Modern circular sofa chair with elegant design. Perfect for contemporary homes.' },

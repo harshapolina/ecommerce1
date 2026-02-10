@@ -22,7 +22,7 @@ const Navbar = () => {
         <div className="top-bar-content container">
           <div className="top-bar-left">
             <FiPhone className="phone-icon" />
-            <span>Call Us : +123-456-789</span>
+            <span>Call Us : +91 6305201265</span>
           </div>
           <div className="top-bar-center">
             {!user ? (
@@ -31,14 +31,22 @@ const Navbar = () => {
                 <Link to="/signup" className="signup-link">Sign up now</Link>
               </>
             ) : (
-              <span>Welcome back, {user.name || 'User'}! 🎉</span>
+              <span>Welcome back, {user.name || 'User'}! </span>
             )}
           </div>
           <div className="top-bar-right">
-            <a href="#" className="social-icon"><FaFacebookF /></a>
-            <a href="#" className="social-icon"><FaTwitter /></a>
-            <a href="#" className="social-icon"><FaInstagram /></a>
-            <a href="#" className="social-icon"><FaYoutube /></a>
+            <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Facebook">
+              <FaFacebookF />
+            </a>
+            <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Twitter">
+              <FaTwitter />
+            </a>
+            <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Instagram">
+              <FaInstagram />
+            </a>
+            <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="YouTube">
+              <FaYoutube />
+            </a>
           </div>
         </div>
       </div>
@@ -50,7 +58,6 @@ const Navbar = () => {
             <div className="logo-icon">
               <span>F</span>
             </div>
-            <span className="logo-text">Furniture</span>
           </Link>
 
           <div className={`nav-links ${mobileMenuOpen ? 'active' : ''}`}>
@@ -89,6 +96,15 @@ const Navbar = () => {
             >
               Blog
             </Link>
+            {user?.isAdmin && (
+              <Link
+                to="/admin"
+                className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Admin
+              </Link>
+            )}
           </div>
 
           <div className="nav-actions">

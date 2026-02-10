@@ -13,6 +13,7 @@ import About from './pages/About';
 import Blog from './pages/Blog';
 import Wishlist from './pages/Wishlist';
 import Profile from './pages/Profile';
+import Admin from './pages/Admin';
 
 export const CartContext = createContext();
 export const AuthContext = createContext();
@@ -127,6 +128,7 @@ function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/admin" element={<Admin />} />
         </Routes>
         </CartContext.Provider>
       </WishlistContext.Provider>

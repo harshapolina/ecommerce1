@@ -188,6 +188,8 @@
   justify-content: center;
   margin-left: auto;
   transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
 }
 
 .category-arrow:hover {

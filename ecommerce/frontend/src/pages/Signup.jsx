@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiShield } from "react-icons/fi";
 import { AuthContext } from "../App";
 import toast from "react-hot-toast";
+import { validatePassword } from "../utils/passwordValidation";
 import "./Auth.css";
 
 const Signup = () => {
@@ -16,6 +17,7 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [devOTP, setDevOTP] = useState("");
+  const [passwordErrors, setPasswordErrors] = useState([]);
 
   const { setUser } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -33,8 +35,9 @@ const Signup = () => {
       return;
     }
 
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      toast.error(passwordValidation.errors[0]);
       return;
     }
 
@@ -65,8 +68,7 @@ const Signup = () => {
 
       if (data.devMode && data.otp) {
         setDevOTP(data.otp);
-        toast.success(`OTP generated! Check below or console.`, { duration: 8000 });
-        console.log('OTP for', email, ':', data.otp);
+        toast.success(`OTP generated! Check below.`, { duration: 8000 });
       } else {
         toast.success("OTP sent to your email!");
         setDevOTP("");
@@ -77,7 +79,6 @@ const Signup = () => {
       setLoading(false);
     } catch (error) {
       toast.dismiss(loadingToast);
-      console.error("Send OTP error:", error);
       
       if (error.name === "TypeError" && error.message.includes("fetch")) {
         toast.error("Cannot connect to server. Please make sure the backend server is running on port 5000.");
@@ -126,6 +127,7 @@ const Signup = () => {
         _id: data.userId,
         name: data.name,
         email: data.email,
+        isAdmin: data.isAdmin || false,
         token: data.token,
       });
 
@@ -133,7 +135,6 @@ const Signup = () => {
       setLoading(false);
     } catch (error) {
       toast.dismiss(loadingToast);
-      console.error("Verify OTP error:", error);
       
       if (error.name === "TypeError" && error.message.includes("fetch")) {
         toast.error("Cannot connect to server. Please make sure the backend server is running on port 5000.");
@@ -188,7 +189,6 @@ const Signup = () => {
             <div className="logo-icon">
               <span>F</span>
             </div>
-            <span className="logo-text">Furniture</span>
           </div>
 
           <h1>Join Us Today</h1>
@@ -251,7 +251,15 @@ const Signup = () => {
                         id="password"
                         placeholder="Create a password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          if (e.target.value) {
+                            const validation = validatePassword(e.target.value);
+                            setPasswordErrors(validation.errors);
+                          } else {
+                            setPasswordErrors([]);
+                          }
+                        }}
                         className="input"
                         required
                       />
@@ -263,6 +271,38 @@ const Signup = () => {
                         {showPassword ? <FiEyeOff /> : <FiEye />}
                       </button>
                     </div>
+                    {password && passwordErrors.length > 0 && (
+                      <div style={{
+                        marginTop: '8px',
+                        padding: '12px',
+                        background: '#fff3cd',
+                        border: '1px solid #ffc107',
+                        borderRadius: '6px',
+                        fontSize: '13px'
+                      }}>
+                        <div style={{ fontWeight: '600', marginBottom: '6px', color: '#856404' }}>
+                          Password must contain:
+                        </div>
+                        <ul style={{ margin: '0', paddingLeft: '20px', color: '#856404' }}>
+                          {passwordErrors.map((error, idx) => (
+                            <li key={idx} style={{ marginBottom: '4px' }}>{error}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {password && passwordErrors.length === 0 && (
+                      <div style={{
+                        marginTop: '8px',
+                        padding: '8px',
+                        background: '#d4edda',
+                        border: '1px solid #28a745',
+                        borderRadius: '6px',
+                        fontSize: '13px',
+                        color: '#155724'
+                      }}>
+                        ✓ Password meets all requirements
+                      </div>
+                    )}
                   </div>
 
                   <div className="form-group">

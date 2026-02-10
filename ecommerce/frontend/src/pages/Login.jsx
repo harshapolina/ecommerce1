@@ -47,12 +47,11 @@ const Login = () => {
         return;
       }
 
-      // Save user data in context
       setUser({
         _id: data.userId,
         name: data.name,
         email: data.email,
-        isAdmin: data.isAdmin,
+        isAdmin: data.isAdmin || false,
         token: data.token,
       });
 
@@ -62,7 +61,6 @@ const Login = () => {
 
     } catch (error) {
       toast.dismiss(loadToast);
-      console.error("Login error:", error);
       
       if (error.name === "TypeError" && error.message.includes("fetch")) {
         toast.error("Cannot connect to server. Please make sure the backend server is running on port 5000.");
@@ -83,7 +81,6 @@ const Login = () => {
             <div className="logo-icon">
               <span>F</span>
             </div>
-            <span className="logo-text">Furniture</span>
           </div>
           <h1>Welcome Back</h1>
           <p>Sign in to continue shopping and track your orders.</p>

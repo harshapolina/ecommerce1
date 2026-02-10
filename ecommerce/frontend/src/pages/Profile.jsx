@@ -1,12 +1,12 @@
 import { useContext, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiUser, FiMail, FiCalendar, FiShoppingBag, FiLogOut, FiEdit2 } from 'react-icons/fi';
+import { FiUser, FiMail, FiCalendar, FiShoppingBag, FiLogOut } from 'react-icons/fi';
 import { AuthContext } from '../App';
 import toast from 'react-hot-toast';
 import './Profile.css';
 
 const Profile = () => {
-  const { user, logout, setUser } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -33,17 +33,10 @@ const Profile = () => {
             setOrders(data.orders || []);
           }
         } else {
-          const savedOrders = localStorage.getItem(`orders_${user._id || user.email}`);
-          if (savedOrders) {
-            setOrders(JSON.parse(savedOrders));
-          }
+          setOrders([]);
         }
       } catch (error) {
-        console.error(error);
-        const savedOrders = localStorage.getItem(`orders_${user._id || user.email}`);
-        if (savedOrders) {
-          setOrders(JSON.parse(savedOrders));
-        }
+        setOrders([]);
       } finally {
         setLoading(false);
       }
@@ -71,7 +64,6 @@ const Profile = () => {
         </div>
 
         <div className="profile-layout">
-          {/* Profile Info Card */}
           <div className="profile-card">
             <div className="profile-card-header">
               <div className="profile-avatar">
@@ -118,7 +110,6 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Orders Section */}
           <div className="orders-section">
             <div className="orders-header">
               <h2>
@@ -136,11 +127,25 @@ const Profile = () => {
                   <div key={order._id || order.razorpayOrderId} className="order-card">
                     <div className="order-header">
                       <div>
-                        <h3>Order #{order.razorpayOrderId || order._id}</h3>
+                        <h3>Order #{order.razorpayOrderId?.slice(-8) || order._id?.slice(-8) || 'N/A'}</h3>
                         <p className="order-date">
                           {order.createdAt 
-                            ? new Date(order.createdAt).toLocaleDateString() 
-                            : new Date().toLocaleDateString()}
+                            ? new Date(order.createdAt).toLocaleString('en-IN', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })
+                            : order.paidAt
+                            ? new Date(order.paidAt).toLocaleString('en-IN', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })
+                            : 'Date not available'}
                         </p>
                       </div>
                       <span className={`order-status ${order.isPaid ? 'paid' : 'pending'}`}>
@@ -149,18 +154,22 @@ const Profile = () => {
                     </div>
 
                     <div className="order-items">
-                      {order.orderItems?.map((item, idx) => (
-                        <div key={idx} className="order-item">
-                          <img src={item.image} alt={item.name} />
-                          <div className="order-item-details">
-                            <h4>{item.name}</h4>
-                            <p>Quantity: {item.quantity} × ₹{item.price.toFixed(2)}</p>
+                      {order.orderItems && order.orderItems.length > 0 ? (
+                        order.orderItems.map((item, idx) => (
+                          <div key={idx} className="order-item">
+                            <img src={item.image || 'https://via.placeholder.com/80'} alt={item.name || 'Product'} />
+                            <div className="order-item-details">
+                              <h4>{item.name || 'Product'}</h4>
+                              <p>Quantity: {item.quantity || 1} × ₹{(item.price || 0).toFixed(2)}</p>
+                            </div>
+                            <span className="order-item-total">
+                              ₹{((item.price || 0) * (item.quantity || 1)).toFixed(2)}
+                            </span>
                           </div>
-                          <span className="order-item-total">
-                            ₹{(item.price * item.quantity).toFixed(2)}
-                          </span>
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        <p style={{ padding: '16px', color: '#666' }}>No items found in this order</p>
+                      )}
                     </div>
 
                     <div className="order-footer">
@@ -170,7 +179,13 @@ const Profile = () => {
                       </div>
                       {order.isPaid && order.paidAt && (
                         <p className="paid-date">
-                          Paid on: {new Date(order.paidAt).toLocaleDateString()}
+                          Paid on: {new Date(order.paidAt).toLocaleString('en-IN', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
                         </p>
                       )}
                     </div>

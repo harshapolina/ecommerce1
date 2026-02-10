@@ -78,14 +78,32 @@ const Cart = () => {
             const verifyRes = await fetch('http://localhost:5000/api/payments/verify-payment', {
               method: 'POST',
               headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${user.token}`
               },
               body: JSON.stringify({
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature
+                razorpay_signature: response.razorpay_signature,
+                orderItems: cartItems,
+                shippingAddress: {
+                  fullName: user.name,
+                  address: 'Address not provided',
+                  city: 'City not provided',
+                  postalCode: '000000',
+                  country: 'India',
+                  phone: '0000000000'
+                },
+                itemsPrice: subtotal,
+                shippingPrice: shipping,
+                totalPrice: total
               })
             });
+
+            if (!verifyRes.ok) {
+              const errorData = await verifyRes.json().catch(() => ({}));
+              throw new Error(errorData.message || 'Payment verification failed');
+            }
 
             const verifyData = await verifyRes.json();
 
@@ -96,12 +114,11 @@ const Cart = () => {
                 navigate('/profile');
               }, 2000);
             } else {
-              toast.error('Payment verification failed');
+              toast.error(verifyData.message || 'Payment verification failed');
               setIsOrdered(false);
             }
           } catch (error) {
-            console.error(error);
-            toast.error('Payment verification failed');
+            toast.error(error.message || 'Payment verification failed');
             setIsOrdered(false);
           } finally {
             setProcessing(false);
@@ -128,7 +145,6 @@ const Cart = () => {
       razorpay.open();
 
     } catch (error) {
-      console.error(error);
       toast.error(error.message || 'Failed to process payment');
       setIsOrdered(false);
       setProcessing(false);

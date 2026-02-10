@@ -3,6 +3,7 @@ import OTP from '../models/otpModel.js';
 import User from '../models/userModel.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { validatePassword } from '../utils/passwordValidation.js';
 
 const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -43,8 +44,9 @@ export const sendOTP = async (req, res) => {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    if (password.length < 6) {
-      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      return res.status(400).json({ message: passwordValidation.errors[0] });
     }
 
     const userExists = await User.findOne({ email });
@@ -76,7 +78,6 @@ export const sendOTP = async (req, res) => {
         email: email
       });
     } catch (emailError) {
-      console.error('Email sending failed:', emailError);
       res.status(200).json({ 
         message: 'OTP generated (email sending failed)',
         email: email,
@@ -86,7 +87,6 @@ export const sendOTP = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Failed to send OTP' });
   }
 };
@@ -140,10 +140,10 @@ export const verifyOTP = async (req, res) => {
       token,
       userId: newUser._id,
       name: newUser.name,
-      email: newUser.email
+      email: newUser.email,
+      isAdmin: newUser.isAdmin
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Failed to verify OTP' });
   }
 };

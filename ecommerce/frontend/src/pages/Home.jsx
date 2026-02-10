@@ -5,7 +5,7 @@ import ProductCard from '../components/ProductCard';
 import './Home.css';
 
 const Home = () => {
-  const [activeTab, setActiveTab] = useState('latest');
+  const [activeTab, setActiveTab] = useState('all');
 
   const features = [
     { icon: <FiTruck />, title: 'Free Shipping', desc: 'Free shipping for order above ₹180' },
@@ -17,7 +17,7 @@ const Home = () => {
   const sofaTypes = ['Reception Sofa', 'Sectional Sofa', 'Armless Sofa', 'Curved Sofa'];
   const lightingTypes = ['Table Lights', 'Floor Lights', 'Ceiling Lights', 'Wall Lights'];
 
-  const products = [
+  const allProducts = [
     {
       _id: '1',
       name: 'Wooden Sofa Chair',
@@ -60,6 +60,15 @@ const Home = () => {
     },
   ];
 
+  const productSections = {
+    all: allProducts,
+    latest: [allProducts[2], allProducts[3], allProducts[0], allProducts[1]],
+    best: [allProducts[1], allProducts[0], allProducts[2], allProducts[3]],
+    featured: [allProducts[1], allProducts[0], allProducts[2]]
+  };
+
+  const displayedProducts = productSections[activeTab] || allProducts;
+
   const tabs = [
     { id: 'all', label: 'All Products' },
     { id: 'latest', label: 'Latest Products' },
@@ -74,7 +83,6 @@ const Home = () => {
         <div className="hero-content container">
           <div className="hero-left">
             <div className="hero-badge">
-              <span className="badge-icon">🛋️</span>
               <span>The Best Online Furniture Store</span>
             </div>
             <h1 className="hero-title">
@@ -123,7 +131,7 @@ const Home = () => {
                     <h4>Living Room</h4>
                     <span>2,500+ Items</span>
                   </div>
-                  <button className="category-arrow"><FiArrowRight /></button>
+                  <Link to="/products" className="category-arrow"><FiArrowRight /></Link>
                 </div>
                 <div className="category-card">
                   <img 
@@ -134,7 +142,7 @@ const Home = () => {
                     <h4>Bed Room</h4>
                     <span>1,500+ Items</span>
                   </div>
-                  <button className="category-arrow"><FiArrowRight /></button>
+                  <Link to="/products" className="category-arrow"><FiArrowRight /></Link>
                 </div>
               </div>
             </div>
@@ -167,7 +175,7 @@ const Home = () => {
           {/* Chairs Category */}
           <div className="category-block chairs">
             <div className="category-content">
-              <span className="item-count"><span className="count-number">1500+</span> Items</span>
+              <span className="item-count"><span className="count-number">50+</span> Items</span>
               <h2 className="category-title">Chairs</h2>
               <p className="category-desc">productssss</p>
               <ul className="category-list">
@@ -185,7 +193,7 @@ const Home = () => {
           <div className="category-side">
             <div className="category-block sofa">
               <div className="category-content">
-                <span className="item-count"><span className="count-number">750+</span> Items</span>
+                <span className="item-count"><span className="count-number">30+</span> Items</span>
                 <h2 className="category-title">Sofa</h2>
                 <ul className="category-list">
                   {sofaTypes.map((type, index) => (
@@ -200,7 +208,7 @@ const Home = () => {
 
             <div className="category-block lighting">
               <div className="category-content">
-                <span className="item-count"><span className="count-number">450+</span> Items</span>
+                <span className="item-count"><span className="count-number">45+</span> Items</span>
                 <h2 className="category-title">Lighting</h2>
                 <ul className="category-list">
                   {lightingTypes.map((type, index) => (
@@ -238,7 +246,7 @@ const Home = () => {
         </div>
 
         <div className="products-grid">
-          {products.map((product, index) => (
+          {displayedProducts.map((product, index) => (
             <ProductCard 
               key={product._id} 
               product={product} 
@@ -256,31 +264,29 @@ const Home = () => {
               <div className="logo-icon">
                 <span>F</span>
               </div>
-              <span className="logo-text">Furniture</span>
             </div>
             <p className="footer-tagline">The best online furniture store for quality and affordable furniture.</p>
           </div>
           <div className="footer-links">
             <div className="footer-column">
               <h4>Shop</h4>
-              <a href="#">All Products</a>
-              <a href="#">New Arrivals</a>
-              <a href="#">Best Sellers</a>
-              <a href="#">Sale</a>
+              <Link to="/products">All Products</Link>
+              <Link to="/products">New Arrivals</Link>
+              <Link to="/products">Best Sellers</Link>
+              <Link to="/products">Sale</Link>
             </div>
             <div className="footer-column">
               <h4>Support</h4>
-              <a href="#">Contact Us</a>
-              <a href="#">FAQs</a>
-              <a href="#">Shipping</a>
-              <a href="#">Returns</a>
+              <Link to="/about">Contact Us</Link>
+              <Link to="/about">FAQs</Link>
+              <Link to="/about">Shipping</Link>
+              <Link to="/about">Returns</Link>
             </div>
             <div className="footer-column">
               <h4>Company</h4>
-              <a href="#">About Us</a>
-              <a href="#">Careers</a>
-              <a href="#">Blog</a>
-              <a href="#">Press</a>
+              <Link to="/about">About Us</Link>
+              <Link to="/blog">Blog</Link>
+              <Link to="/categories">Categories</Link>
             </div>
           </div>
         </div>

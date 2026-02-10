@@ -89,12 +89,6 @@
   font-size: 18px;
 }
 
-.logo-text {
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
 .nav-links {
   display: flex;
   gap: 32px;
@@ -223,7 +217,4 @@
     height: 70px;
   }
 
-  .logo-text {
-    font-size: 18px;
-  }
 }
