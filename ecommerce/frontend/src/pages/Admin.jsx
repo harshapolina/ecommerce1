@@ -10,8 +10,10 @@ const Admin = () => {
   const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loadingOrders, setLoadingOrders] = useState(false);
+  const [loadingProducts, setLoadingProducts] = useState(false);
   const [productForm, setProductForm] = useState({
     name: '',
     description: '',
@@ -21,6 +23,8 @@ const Admin = () => {
     stock: ''
   });
   const [savingProduct, setSavingProduct] = useState(false);
+
+  const baseCategories = ['Chair', 'Sofa', 'Table', 'Lighting', 'Storage', 'Decor'];
 
   useEffect(() => {
     if (!user || !user.isAdmin) {
@@ -72,10 +76,33 @@ const Admin = () => {
     }
   };
 
+  const fetchProducts = async () => {
+    if (!user) return;
+    setLoadingProducts(true);
+    try {
+      const res = await fetch('http://localhost:5000/api/products/products', {
+        headers: {
+          'Authorization': `Bearer ${user.token}`
+        }
+      });
+      const data = await res.json();
+      if (res.ok && Array.isArray(data)) {
+        setProducts(data);
+      } else {
+        setProducts([]);
+      }
+    } catch (error) {
+      setProducts([]);
+    } finally {
+      setLoadingProducts(false);
+    }
+  };
+
   useEffect(() => {
     if (user && user.isAdmin) {
       fetchUsers();
       fetchOrders();
+      fetchProducts();
     }
   }, [user]);
 
@@ -128,10 +155,38 @@ const Admin = () => {
         category: '',
         stock: ''
       });
+      fetchProducts();
     } catch (error) {
       toast.error(error.message || 'Failed to add product');
     } finally {
       setSavingProduct(false);
+    }
+  };
+
+  const handleDeleteProduct = async (productId) => {
+    if (!user || !productId) return;
+
+    const confirmed = window.confirm('Are you sure you want to delete this product?');
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/products/products/${productId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${user.token}`
+        }
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Failed to delete product');
+      }
+
+      toast.success('Product deleted successfully');
+      setProducts(prev => prev.filter(p => p._id !== productId));
+    } catch (error) {
+      toast.error(error.message || 'Failed to delete product');
     }
   };
 
@@ -181,7 +236,7 @@ const Admin = () => {
                   className={`btn ${activeTab === 'products' ? 'btn-primary' : 'btn-secondary'}`}
                   onClick={() => setActiveTab('products')}
                 >
-                  Add Product
+                  Products
                 </button>
                 <button
                   className={`btn ${activeTab === 'orders' ? 'btn-primary' : 'btn-secondary'}`}
@@ -226,9 +281,9 @@ const Admin = () => {
             {activeTab === 'products' && (
               <>
                 <div className="orders-header">
-                  <h2>Add Product</h2>
+                  <h2>Manage Products</h2>
                 </div>
-                <form onSubmit={handleAddProduct} className="auth-form">
+                <form onSubmit={handleAddProduct} className="auth-form" style={{ marginBottom: '24px' }}>
                   <div className="form-group">
                     <label htmlFor="name">Name</label>
                     <input
@@ -271,13 +326,35 @@ const Admin = () => {
                   </div>
                   <div className="form-group">
                     <label htmlFor="category">Category</label>
-                    <input
+                    <select
                       id="category"
-                      type="text"
                       className="input"
-                      value={productForm.category}
-                      onChange={e => handleProductChange('category', e.target.value)}
-                    />
+                      value={productForm.category || ''}
+                      onChange={e => {
+                        const value = e.target.value;
+                        if (value === '__custom__') {
+                          handleProductChange('category', '');
+                        } else {
+                          handleProductChange('category', value);
+                        }
+                      }}
+                    >
+                      <option value="">Select category</option>
+                      {baseCategories.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                      <option value="__custom__">Custom...</option>
+                    </select>
+                    {productForm.category === '' && (
+                      <input
+                        type="text"
+                        className="input"
+                        style={{ marginTop: '8px' }}
+                        placeholder="Enter custom category"
+                        value={productForm.category}
+                        onChange={e => handleProductChange('category', e.target.value)}
+                      />
+                    )}
                   </div>
                   <div className="form-group">
                     <label htmlFor="stock">Stock</label>
@@ -297,6 +374,37 @@ const Admin = () => {
                     {savingProduct ? 'Saving...' : 'Add Product'}
                   </button>
                 </form>
+
+                <div className="orders-header" style={{ marginTop: '8px' }}>
+                  <h2>All Products</h2>
+                </div>
+
+                {loadingProducts ? (
+                  <p>Loading products...</p>
+                ) : products.length === 0 ? (
+                  <p>No products found.</p>
+                ) : (
+                  <div className="orders-list">
+                    {products.map(product => (
+                      <div key={product._id} className="order-card">
+                        <div className="order-header">
+                          <div>
+                            <h3>{product.name}</h3>
+                            <p className="order-date">
+                              {product.category || 'Uncategorized'} • ₹{Number(product.price || 0).toFixed(2)}
+                            </p>
+                          </div>
+                          <button
+                            className="btn btn-secondary"
+                            onClick={() => handleDeleteProduct(product._id)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </>
             )}
 

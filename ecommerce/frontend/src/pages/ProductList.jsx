@@ -17,9 +17,10 @@ const ProductList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 12;
 
-  const categories = ['All', 'Chair', 'Sofa', 'Table', 'Lighting', 'Storage', 'Decor'];
+  const baseCategories = ['All', 'Chair', 'Sofa', 'Table', 'Lighting', 'Storage', 'Decor'];
+  const [categories, setCategories] = useState(baseCategories);
 
-  // Mock products data - Expanded list with more products
+  // Mock products data - existing demo products
   const mockProducts = [
     // Chairs
     { _id: '1', name: 'Wooden Sofa Chair', category: 'Chair', price: 80.00, originalPrice: 160.00, image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800', rating: 4.9, stock: 15 },
@@ -85,34 +86,84 @@ const ProductList = () => {
   ];
 
   useEffect(() => {
-    setLoading(true);
-    setCurrentPage(1);
-    
-    // Simulate API call
-    setTimeout(() => {
-      let filtered = [...mockProducts];
-      
-      // Filter by category
-      if (selectedCategory !== 'all' && selectedCategory !== 'All') {
-        filtered = filtered.filter(p => p.category.toLowerCase() === selectedCategory.toLowerCase());
+    const fetchAndMergeProducts = async () => {
+      setLoading(true);
+      setCurrentPage(1);
+
+      try {
+        const res = await fetch('http://localhost:5000/api/products/products');
+        let dbProducts = [];
+        if (res.ok) {
+          const data = await res.json();
+          dbProducts = Array.isArray(data) ? data : [];
+        }
+
+        const merged = [...mockProducts, ...dbProducts];
+
+        const catSet = new Set(baseCategories);
+        merged.forEach(p => {
+          if (p.category && p.category.trim()) {
+            catSet.add(p.category.trim());
+          }
+        });
+        setCategories(Array.from(catSet));
+
+        let filtered = [...merged];
+
+        if (selectedCategory !== 'all' && selectedCategory !== 'All') {
+          filtered = filtered.filter(
+            p =>
+              p.category &&
+              p.category.toLowerCase() === selectedCategory.toLowerCase()
+          );
+        }
+
+        filtered = filtered.filter(
+          p => p.price >= priceRange[0] && p.price <= priceRange[1]
+        );
+
+        if (sortBy === 'price-low') {
+          filtered.sort((a, b) => a.price - b.price);
+        } else if (sortBy === 'price-high') {
+          filtered.sort((a, b) => b.price - a.price);
+        } else if (sortBy === 'rating') {
+          filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        }
+
+        setAllProducts(filtered);
+        setDisplayedProducts(filtered.slice(0, productsPerPage));
+      } catch (error) {
+        console.error('Failed to load products from server, using defaults only:', error);
+        let filtered = [...mockProducts];
+
+        if (selectedCategory !== 'all' && selectedCategory !== 'All') {
+          filtered = filtered.filter(
+            p =>
+              p.category &&
+              p.category.toLowerCase() === selectedCategory.toLowerCase()
+          );
+        }
+
+        filtered = filtered.filter(
+          p => p.price >= priceRange[0] && p.price <= priceRange[1]
+        );
+
+        if (sortBy === 'price-low') {
+          filtered.sort((a, b) => a.price - b.price);
+        } else if (sortBy === 'price-high') {
+          filtered.sort((a, b) => b.price - a.price);
+        } else if (sortBy === 'rating') {
+          filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        }
+
+        setAllProducts(filtered);
+        setDisplayedProducts(filtered.slice(0, productsPerPage));
+      } finally {
+        setLoading(false);
       }
-      
-      // Filter by price range
-      filtered = filtered.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
-      
-      // Sort products
-      if (sortBy === 'price-low') {
-        filtered.sort((a, b) => a.price - b.price);
-      } else if (sortBy === 'price-high') {
-        filtered.sort((a, b) => b.price - a.price);
-      } else if (sortBy === 'rating') {
-        filtered.sort((a, b) => b.rating - a.rating);
-      }
-      
-      setAllProducts(filtered);
-      setDisplayedProducts(filtered.slice(0, productsPerPage));
-      setLoading(false);
-    }, 500);
+    };
+
+    fetchAndMergeProducts();
   }, [selectedCategory, priceRange, sortBy]);
 
   // Load more products when page changes

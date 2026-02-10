@@ -16,18 +16,85 @@ const ProductDetails = () => {
   const [activeTab, setActiveTab] = useState('description');
 
   const mockProducts = {
-    '1': { _id: '1', name: 'Wooden Sofa Chair', category: 'Chair', price: 80.00, originalPrice: 160.00, image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800', rating: 4.9, stock: 15, description: 'A beautiful wooden sofa chair perfect for your living room. Made with premium quality wood and comfortable cushioning.' },
-    '2': { _id: '2', name: 'Circular Sofa Chair', category: 'Chair', price: 108.00, originalPrice: 120.00, image: 'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=800', rating: 5.0, stock: 10, description: 'Modern circular sofa chair with elegant design. Perfect for contemporary homes.' },
-    '3': { _id: '3', name: 'Wooden Nightstand', category: 'Table', price: 54.00, originalPrice: 60.00, image: 'https://images.unsplash.com/photo-1532372320572-cda25653a26d?w=800', rating: 4.8, stock: 20, description: 'Compact wooden nightstand with drawer storage. Ideal bedside companion.' },
-    '4': { _id: '4', name: 'Bean Bag Chair', category: 'Chair', price: 72.00, originalPrice: 80.00, image: 'https://images.unsplash.com/photo-1519947486511-46149fa0a254?w=800', rating: 4.6, stock: 8, description: 'Comfortable bean bag chair for casual seating. Available in multiple colors.' },
+    '1': {
+      _id: '1',
+      name: 'Wooden Sofa Chair',
+      category: 'Chair',
+      price: 80.0,
+      originalPrice: 160.0,
+      image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800',
+      rating: 4.9,
+      stock: 15,
+      description:
+        'A beautiful wooden sofa chair perfect for your living room. Made with premium quality wood and comfortable cushioning.',
+    },
+    '2': {
+      _id: '2',
+      name: 'Circular Sofa Chair',
+      category: 'Chair',
+      price: 108.0,
+      originalPrice: 120.0,
+      image: 'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=800',
+      rating: 5.0,
+      stock: 10,
+      description:
+        'Modern circular sofa chair with elegant design. Perfect for contemporary homes.',
+    },
+    '3': {
+      _id: '3',
+      name: 'Wooden Nightstand',
+      category: 'Table',
+      price: 54.0,
+      originalPrice: 60.0,
+      image: 'https://images.unsplash.com/photo-1532372320572-cda25653a26d?w=800',
+      rating: 4.8,
+      stock: 20,
+      description:
+        'Compact wooden nightstand with drawer storage. Ideal bedside companion.',
+    },
+    '4': {
+      _id: '4',
+      name: 'Bean Bag Chair',
+      category: 'Chair',
+      price: 72.0,
+      originalPrice: 80.0,
+      image: 'https://images.unsplash.com/photo-1519947486511-46149fa0a254?w=800',
+      rating: 4.6,
+      stock: 8,
+      description:
+        'Comfortable bean bag chair for casual seating. Available in multiple colors.',
+    },
   };
 
   useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
+    const loadProduct = async () => {
+      setLoading(true);
+
+      const isMongoId = id && id.length === 24;
+
+      if (isMongoId) {
+        try {
+          const res = await fetch(`http://localhost:5000/api/products/products/${id}`);
+          const data = await res.json();
+
+          if (res.ok && data && data._id) {
+            setProduct(data);
+            setLoading(false);
+            return;
+          }
+        } catch (error) {
+          console.error('Failed to load product from server, falling back to demo products.');
+        }
+      }
+
+      // Fallback to static demo products for original items
       setProduct(mockProducts[id] || mockProducts['1']);
       setLoading(false);
-    }, 300);
+    };
+
+    if (id) {
+      loadProduct();
+    }
   }, [id]);
 
   const handleAddToCart = () => {
