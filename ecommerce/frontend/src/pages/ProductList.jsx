@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { FiGrid, FiList, FiFilter, FiX } from 'react-icons/fi';
 import ProductCard from '../components/ProductCard';
+import API_URL from '../config/api';
 import './ProductList.css';
 
 const ProductList = () => {
@@ -91,7 +92,7 @@ const ProductList = () => {
       setCurrentPage(1);
 
       try {
-        const res = await fetch('http://localhost:5000/api/products/products');
+        const res = await fetch(`${API_URL}/api/products/products`);
         let dbProducts = [];
         if (res.ok) {
           const data = await res.json();

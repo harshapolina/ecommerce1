@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { FiMinus, FiPlus, FiHeart, FiShare2, FiTruck, FiShield, FiRefreshCw, FiStar } from 'react-icons/fi';
 import { CartContext, WishlistContext } from '../App';
 import toast from 'react-hot-toast';
+import API_URL from '../config/api';
 import './ProductDetails.css';
 
 const ProductDetails = () => {
@@ -74,7 +75,7 @@ const ProductDetails = () => {
 
       if (isMongoId) {
         try {
-          const res = await fetch(`http://localhost:5000/api/products/products/${id}`);
+          const res = await fetch(`${API_URL}/api/products/products/${id}`);
           const data = await res.json();
 
           if (res.ok && data && data._id) {

@@ -23,8 +23,9 @@ RAZORPAY_KEY_SECRET=iP25EvoBTClrR3lJchcbXbsc
 
 # Email Configuration (for OTP)
 # For Gmail, use App Password from Google Account settings
+# IMPORTANT: Remove all spaces from the app password (it should be 16 characters without spaces)
 EMAIL_USER=harshapolinax@gmail.com
-EMAIL_PASS=gwyd ousq jpbs gjvr
+EMAIL_PASS=gwydousqjpbsgjvr
 
 
 ## Frontend Environment Variables
@@ -32,6 +33,11 @@ EMAIL_PASS=gwyd ousq jpbs gjvr
 Create a file named `.env` or `.env.local` in the `ecommerce/frontend/` directory with the following variables:
 
 ```env
+# Backend API URL
+# For production: https://ecom-backend-aevh.onrender.com
+# For local development: http://localhost:5000 (or leave empty to use default)
+VITE_API_URL=https://ecom-backend-aevh.onrender.com
+
 # Razorpay Key ID (public key)
 VITE_RAZORPAY_KEY_ID=rzp_test_SBjgUiAL2qDOF8
 
@@ -72,7 +78,9 @@ VITE_FIREBASE_MEASUREMENT_ID=G-K8VZD4KR9M
 - **Never commit `.env` files to Git** - They contain sensitive information
 - The `.env` files are already in `.gitignore`
 - Use `.env.example` files as templates (without actual credentials)
-- For production, use secure environment variable management (like Vercel, Heroku, etc.)
+- For production, use secure environment variable management (like Vercel, Heroku, Render, etc.)
+- **For deployed backend (Render)**: Make sure to set `EMAIL_USER` and `EMAIL_PASS` environment variables in your Render dashboard
+- **Email Password**: Gmail app passwords should NOT have spaces. The code automatically removes spaces, but it's better to set it without spaces in your environment variables
 
 ## Variable Descriptions:
 
@@ -83,6 +91,7 @@ VITE_FIREBASE_MEASUREMENT_ID=G-K8VZD4KR9M
 - **RAZORPAY_KEY_SECRET**: Your Razorpay secret key
 - **EMAIL_USER**: Gmail address for sending OTP emails
 - **EMAIL_PASS**: Gmail App Password (not your regular password)
+- **VITE_API_URL**: Backend API URL (production or localhost for development)
 - **VITE_RAZORPAY_KEY_ID**: Same as RAZORPAY_KEY_ID, for frontend use
 - **VITE_FIREBASE_API_KEY**: Firebase API key for authentication
 - **VITE_FIREBASE_AUTH_DOMAIN**: Firebase authentication domain

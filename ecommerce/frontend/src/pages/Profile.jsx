@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FiUser, FiMail, FiCalendar, FiShoppingBag, FiLogOut } from 'react-icons/fi';
 import { AuthContext } from '../App';
 import toast from 'react-hot-toast';
+import API_URL from '../config/api';
 import './Profile.css';
 
 const Profile = () => {
@@ -21,7 +22,7 @@ const Profile = () => {
     const fetchOrders = async () => {
       setLoading(true);
       try {
-        const res = await fetch('http://localhost:5000/api/payments/orders', {
+        const res = await fetch(`${API_URL}/api/payments/orders`, {
           headers: {
             'Authorization': `Bearer ${user.token}`
           }

@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../App';
 import toast from 'react-hot-toast';
+import API_URL from '../config/api';
 import './Profile.css';
 
 const Admin = () => {
@@ -37,7 +38,7 @@ const Admin = () => {
     if (!user) return;
     setLoadingUsers(true);
     try {
-      const res = await fetch('http://localhost:5000/api/users/admin/users', {
+      const res = await fetch(`${API_URL}/api/users/admin/users`, {
         headers: {
           'Authorization': `Bearer ${user.token}`
         }
@@ -58,7 +59,7 @@ const Admin = () => {
     if (!user) return;
     setLoadingOrders(true);
     try {
-      const res = await fetch('http://localhost:5000/api/payments/admin/orders', {
+      const res = await fetch(`${API_URL}/api/payments/admin/orders`, {
         headers: {
           'Authorization': `Bearer ${user.token}`
         }
@@ -80,7 +81,7 @@ const Admin = () => {
     if (!user) return;
     setLoadingProducts(true);
     try {
-      const res = await fetch('http://localhost:5000/api/products/products', {
+      const res = await fetch(`${API_URL}/api/products/products`, {
         headers: {
           'Authorization': `Bearer ${user.token}`
         }
@@ -124,7 +125,7 @@ const Admin = () => {
 
     setSavingProduct(true);
     try {
-      const res = await fetch('http://localhost:5000/api/products/products', {
+      const res = await fetch(`${API_URL}/api/products/products`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -170,7 +171,7 @@ const Admin = () => {
     if (!confirmed) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/products/products/${productId}`, {
+      const res = await fetch(`${API_URL}/api/products/products/${productId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${user.token}`

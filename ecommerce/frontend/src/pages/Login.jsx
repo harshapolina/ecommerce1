@@ -5,6 +5,7 @@ import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "../config/firebase";
 import { AuthContext } from "../App";
 import toast from "react-hot-toast";
+import API_URL from "../config/api";
 import "./Auth.css";
 
 const Login = () => {
@@ -28,7 +29,7 @@ const Login = () => {
     const loadToast = toast.loading("Signing you in...");
 
     try {
-      const response = await fetch("http://localhost:5000/api/users/login", {
+      const response = await fetch(`${API_URL}/api/users/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -81,7 +82,7 @@ const Login = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      const response = await fetch("http://localhost:5000/api/users/social-auth", {
+      const response = await fetch(`${API_URL}/api/users/social-auth`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

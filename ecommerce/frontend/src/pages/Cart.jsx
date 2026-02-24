@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FiMinus, FiPlus, FiTrash2, FiArrowLeft, FiShoppingBag } from 'react-icons/fi';
 import { CartContext, AuthContext } from '../App';
 import toast from 'react-hot-toast';
+import API_URL from '../config/api';
 import './Cart.css';
 
 const loadRazorpayScript = () => {
@@ -51,7 +52,7 @@ const Cart = () => {
         return;
       }
 
-      const res = await fetch('http://localhost:5000/api/payments/create-order', {
+      const res = await fetch(`${API_URL}/api/payments/create-order`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -75,7 +76,7 @@ const Cart = () => {
         order_id: order.id,
         handler: async function (response) {
           try {
-            const verifyRes = await fetch('http://localhost:5000/api/payments/verify-payment', {
+            const verifyRes = await fetch(`${API_URL}/api/payments/verify-payment`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',

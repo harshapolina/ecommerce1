@@ -10,30 +10,69 @@ const generateOTP = () => {
 };
 
 const sendOTPEmail = async (email, otp) => {
+  const emailUser = process.env.EMAIL_USER;
+  const emailPass = process.env.EMAIL_PASS;
+
+  if (!emailUser || !emailPass) {
+    throw new Error('Email credentials (EMAIL_USER and EMAIL_PASS) are not configured in environment variables');
+  }
+
+  // Remove spaces from email password (Gmail app passwords don't have spaces)
+  const cleanEmailPass = emailPass.replace(/\s/g, '');
+
+  if (cleanEmailPass.length < 16) {
+    throw new Error('Invalid email password format. Gmail app passwords should be 16 characters without spaces.');
+  }
+
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.EMAIL_USER || 'harshapolinax@gmail.com',
-      pass: process.env.EMAIL_PASS || 'gwyd ousq jpbs gjvr'
+      user: emailUser,
+      pass: cleanEmailPass
     }
   });
 
+  // Verify transporter configuration before sending
+  try {
+    await transporter.verify();
+    console.log('Email server is ready to send messages');
+  } catch (verifyError) {
+    console.error('Email server verification failed:', verifyError);
+    throw new Error(`Email server configuration error: ${verifyError.message}`);
+  }
+
   const mailOptions = {
-    from: process.env.EMAIL_USER || 'harshapolinax@gmail.com',
+    from: `"Furniture Store" <${emailUser}>`,
     to: email,
-    subject: 'OTP for Account Verification',
+    subject: 'OTP for Account Verification - Furniture Store',
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #1B6B3A;">Furniture Store - OTP Verification</h2>
-        <p>Your OTP for account verification is:</p>
-        <h1 style="color: #1B6B3A; font-size: 32px; text-align: center; padding: 20px; background: #f0f0f0; border-radius: 8px;">${otp}</h1>
-        <p>This OTP will expire in 15 minutes.</p>
-        <p>If you didn't request this, please ignore this email.</p>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #1B6B3A 0%, #2d8650 100%); padding: 20px; border-radius: 10px 10px 0 0; text-align: center;">
+          <h1 style="color: white; margin: 0;">Furniture Store</h1>
+        </div>
+        <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
+          <h2 style="color: #1B6B3A; margin-top: 0;">OTP Verification</h2>
+          <p style="color: #666; font-size: 16px;">Your OTP for account verification is:</p>
+          <div style="background: white; border: 2px solid #1B6B3A; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0;">
+            <h1 style="color: #1B6B3A; font-size: 36px; letter-spacing: 8px; margin: 0; font-family: monospace;">${otp}</h1>
+          </div>
+          <p style="color: #666; font-size: 14px;">This OTP will expire in 15 minutes.</p>
+          <p style="color: #999; font-size: 12px; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+            If you didn't request this OTP, please ignore this email.
+          </p>
+        </div>
       </div>
     `
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully to', email, '- Message ID:', info.messageId);
+    return info;
+  } catch (sendError) {
+    console.error('Failed to send email:', sendError);
+    throw new Error(`Failed to send email: ${sendError.message}`);
+  }
 };
 
 export const sendOTP = async (req, res) => {
@@ -73,17 +112,25 @@ export const sendOTP = async (req, res) => {
 
     try {
       await sendOTPEmail(email, otp);
+      console.log(`OTP sent successfully to ${email}`);
       res.status(200).json({ 
         message: 'OTP sent to your email',
         email: email
       });
     } catch (emailError) {
-      res.status(200).json({ 
-        message: 'OTP generated (email sending failed)',
-        email: email,
-        otp: otp,
-        devMode: true,
-        error: emailError.message
+      console.error('Email sending error:', emailError);
+      // Log the full error for debugging
+      console.error('Error details:', {
+        message: emailError.message,
+        code: emailError.code,
+        response: emailError.response,
+        responseCode: emailError.responseCode
+      });
+      
+      // Return error - don't send OTP in response for security
+      res.status(500).json({ 
+        message: 'Failed to send OTP email. Please try again or contact support.',
+        error: process.env.NODE_ENV === 'development' ? emailError.message : undefined
       });
     }
   } catch (error) {
