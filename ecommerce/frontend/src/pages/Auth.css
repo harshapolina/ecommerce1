@@ -204,8 +204,8 @@
 
 /* Social Buttons */
 .social-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  justify-content: center;
   gap: 12px;
 }
 
@@ -222,6 +222,7 @@
   font-weight: 500;
   color: var(--text-primary);
   transition: all 0.3s ease;
+  min-width: 200px;
 }
 
 .social-btn:hover {
@@ -262,7 +263,7 @@
   }
 
   .social-buttons {
-    grid-template-columns: 1fr;
+    justify-content: center;
   }
 }
 

@@ -108,4 +108,74 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, getUserProfile, getAllUsers };
+const socialAuth = async (req, res) => {
+  try {
+    const { name, email, provider, providerId } = req.body;
+
+    if (!name || !email) {
+      return res.status(400).json({ message: "Name and email are required" });
+    }
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+      if (user.email === ADMIN_EMAIL && !user.isAdmin) {
+        user.isAdmin = true;
+        await user.save();
+      }
+
+      const token = jwt.sign(
+        {
+          userId: user._id,
+          name: user.name,
+          email: user.email,
+          isAdmin: user.isAdmin,
+        },
+        process.env.JWT_SECRET || "secretKey",
+        { expiresIn: "30d" }
+      );
+
+      return res.status(200).json({
+        message: "Login successful",
+        token,
+        userId: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      });
+    }
+
+    const newUser = new User({
+      name,
+      email,
+      password: `social_${providerId}_${Date.now()}`,
+      isAdmin: email === ADMIN_EMAIL,
+    });
+
+    await newUser.save();
+
+    const token = jwt.sign(
+      {
+        userId: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        isAdmin: newUser.isAdmin,
+      },
+      process.env.JWT_SECRET || "secretKey",
+      { expiresIn: "30d" }
+    );
+
+    return res.status(201).json({
+      message: "Registration successful",
+      token,
+      userId: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+      isAdmin: newUser.isAdmin,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message || "Server error" });
+  }
+};
+
+export { registerUser, loginUser, getUserProfile, getAllUsers, socialAuth };
