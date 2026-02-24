@@ -34,6 +34,16 @@ Create a file named `.env` or `.env.local` in the `ecommerce/frontend/` director
 ```env
 # Razorpay Key ID (public key)
 VITE_RAZORPAY_KEY_ID=rzp_test_SBjgUiAL2qDOF8
+
+# Firebase Configuration
+# Get these from https://console.firebase.google.com/
+VITE_FIREBASE_API_KEY=AIzaSyDKvGJayaN0L-MBHjj-yl2WuEkpBwTIWVo
+VITE_FIREBASE_AUTH_DOMAIN=harsha-42823.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=harsha-42823
+VITE_FIREBASE_STORAGE_BUCKET=harsha-42823.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=802937303612
+VITE_FIREBASE_APP_ID=1:802937303612:web:a9b7fc5172478f68200939
+VITE_FIREBASE_MEASUREMENT_ID=G-K8VZD4KR9M
 ```
 
 **Note:** In Vite, environment variables must be prefixed with `VITE_` to be accessible in the frontend.
@@ -74,6 +84,13 @@ VITE_RAZORPAY_KEY_ID=rzp_test_SBjgUiAL2qDOF8
 - **EMAIL_USER**: Gmail address for sending OTP emails
 - **EMAIL_PASS**: Gmail App Password (not your regular password)
 - **VITE_RAZORPAY_KEY_ID**: Same as RAZORPAY_KEY_ID, for frontend use
+- **VITE_FIREBASE_API_KEY**: Firebase API key for authentication
+- **VITE_FIREBASE_AUTH_DOMAIN**: Firebase authentication domain
+- **VITE_FIREBASE_PROJECT_ID**: Firebase project ID
+- **VITE_FIREBASE_STORAGE_BUCKET**: Firebase storage bucket URL
+- **VITE_FIREBASE_MESSAGING_SENDER_ID**: Firebase messaging sender ID
+- **VITE_FIREBASE_APP_ID**: Firebase application ID
+- **VITE_FIREBASE_MEASUREMENT_ID**: Firebase analytics measurement ID
 
 ## Getting Gmail App Password:
 
