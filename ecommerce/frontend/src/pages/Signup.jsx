@@ -59,16 +59,37 @@ const Signup = () => {
         }),
       });
 
-      const data = await response.json();
-      toast.dismiss(loadingToast);
-
-      if (!response.ok) {
-        toast.error(data.message || "Failed to send OTP");
+      // Check if response is JSON before parsing
+      const contentType = response.headers.get("content-type");
+      let data;
+      
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        // If not JSON, get text response
+        const text = await response.text();
+        toast.dismiss(loadingToast);
+        toast.error(text || "Failed to send OTP");
         setLoading(false);
         return;
       }
 
-      toast.success("OTP sent to your email! Please check your inbox.");
+      toast.dismiss(loadingToast);
+
+      if (!response.ok) {
+        const errorMsg = data.message || data.error || "Failed to send OTP";
+        toast.error(errorMsg);
+        setLoading(false);
+        return;
+      }
+
+      if (data.success !== false) {
+        toast.success("OTP sent to your email! Please check your inbox and spam folder.");
+      } else {
+        toast.error(data.message || "Failed to send OTP");
+        setLoading(false);
+        return;
+      }
       
       setOtpSent(true);
       setStep(2);
@@ -77,7 +98,9 @@ const Signup = () => {
       toast.dismiss(loadingToast);
       
       if (error.name === "TypeError" && error.message.includes("fetch")) {
-        toast.error("Cannot connect to server. Please make sure the backend server is running on port 5000.");
+        toast.error("Cannot connect to server. Please check your connection and try again.");
+      } else if (error instanceof SyntaxError) {
+        toast.error("Server error. Please try again later.");
       } else {
         toast.error(error.message || "Network error. Please check your connection and try again.");
       }
@@ -158,7 +181,21 @@ const Signup = () => {
         }),
       });
 
-      const data = await response.json();
+      // Check if response is JSON before parsing
+      const contentType = response.headers.get("content-type");
+      let data;
+      
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        // If not JSON, get text response
+        const text = await response.text();
+        toast.dismiss(loadingToast);
+        toast.error(text || "Failed to resend OTP");
+        setLoading(false);
+        return;
+      }
+
       toast.dismiss(loadingToast);
 
       if (!response.ok) {
@@ -171,7 +208,14 @@ const Signup = () => {
       setLoading(false);
     } catch (error) {
       toast.dismiss(loadingToast);
-      toast.error("Failed to resend OTP");
+      
+      if (error.name === "TypeError" && error.message.includes("fetch")) {
+        toast.error("Cannot connect to server. Please check your connection and try again.");
+      } else if (error instanceof SyntaxError) {
+        toast.error("Server error. Please try again later.");
+      } else {
+        toast.error(error.message || "Failed to resend OTP");
+      }
       setLoading(false);
     }
   };

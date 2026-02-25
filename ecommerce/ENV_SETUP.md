@@ -25,7 +25,7 @@ RAZORPAY_KEY_SECRET=iP25EvoBTClrR3lJchcbXbsc
 # For Gmail, use App Password from Google Account settings
 # IMPORTANT: Remove all spaces from the app password (it should be 16 characters without spaces)
 EMAIL_USER=harshapolinax@gmail.com
-EMAIL_PASS=gwydousqjpbsgjvr
+EMAIL_PASS=wwndutezhsluleho
 
 
 ## Frontend Environment Variables
@@ -34,9 +34,9 @@ Create a file named `.env` or `.env.local` in the `ecommerce/frontend/` director
 
 ```env
 # Backend API URL
+# For local development: http://localhost:5000
 # For production: https://ecom-backend-aevh.onrender.com
-# For local development: http://localhost:5000 (or leave empty to use default)
-VITE_API_URL=https://ecom-backend-aevh.onrender.com
+VITE_API_URL=http://localhost:5000
 
 # Razorpay Key ID (public key)
 VITE_RAZORPAY_KEY_ID=rzp_test_SBjgUiAL2qDOF8
@@ -81,6 +81,15 @@ VITE_FIREBASE_MEASUREMENT_ID=G-K8VZD4KR9M
 - For production, use secure environment variable management (like Vercel, Heroku, Render, etc.)
 - **For deployed backend (Render)**: Make sure to set `EMAIL_USER` and `EMAIL_PASS` environment variables in your Render dashboard
 - **Email Password**: Gmail app passwords should NOT have spaces. The code automatically removes spaces, but it's better to set it without spaces in your environment variables
+
+## Updating Email Password in Render:
+
+1. Go to your Render Dashboard: https://dashboard.render.com
+2. Select your backend service
+3. Go to "Environment" tab
+4. Update `EMAIL_PASS` with: `wwndutezhsluleho` (or you can use `wwnd utez hslu leho` - spaces will be removed automatically)
+5. Click "Save Changes"
+6. Your service will automatically redeploy with the new password
 
 ## Variable Descriptions:
 

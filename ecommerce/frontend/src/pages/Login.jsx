@@ -41,7 +41,21 @@ const Login = () => {
         }),
       });
 
-      const data = await response.json();
+      // Check if response is JSON before parsing
+      const contentType = response.headers.get("content-type");
+      let data;
+      
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        // If not JSON, get text response
+        const text = await response.text();
+        toast.dismiss(loadToast);
+        toast.error(text || "Login failed");
+        setLoading(false);
+        return;
+      }
+
       toast.dismiss(loadToast);
 
       if (!response.ok) {
@@ -66,7 +80,9 @@ const Login = () => {
       toast.dismiss(loadToast);
       
       if (error.name === "TypeError" && error.message.includes("fetch")) {
-        toast.error("Cannot connect to server. Please make sure the backend server is running on port 5000.");
+        toast.error("Cannot connect to server. Please check your connection and try again.");
+      } else if (error instanceof SyntaxError) {
+        toast.error("Server error. Please try again later.");
       } else {
         toast.error(error.message || "Network error. Please check your connection and try again.");
       }

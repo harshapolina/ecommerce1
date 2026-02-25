@@ -14,36 +14,48 @@ const sendOTPEmail = async (email, otp) => {
   const emailPass = process.env.EMAIL_PASS;
 
   if (!emailUser || !emailPass) {
-    throw new Error('Email credentials (EMAIL_USER and EMAIL_PASS) are not configured in environment variables');
+    console.error('Email credentials missing. EMAIL_USER:', !!emailUser, 'EMAIL_PASS:', !!emailPass);
+    throw new Error('Email credentials (EMAIL_USER and EMAIL_PASS) are not configured in environment variables. Please set them in your .env file or deployment environment.');
   }
 
   // Remove spaces from email password (Gmail app passwords don't have spaces)
   const cleanEmailPass = emailPass.replace(/\s/g, '');
 
   if (cleanEmailPass.length < 16) {
+    console.error('Invalid email password length:', cleanEmailPass.length);
     throw new Error('Invalid email password format. Gmail app passwords should be 16 characters without spaces.');
   }
 
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: emailUser,
+      user: emailUser.trim(),
       pass: cleanEmailPass
-    }
+    },
+    // Add timeout and connection settings
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000
   });
 
   // Verify transporter configuration before sending
   try {
     await transporter.verify();
-    console.log('Email server is ready to send messages');
+    console.log('✓ Email server is ready to send messages');
   } catch (verifyError) {
-    console.error('Email server verification failed:', verifyError);
-    throw new Error(`Email server configuration error: ${verifyError.message}`);
+    console.error('✗ Email server verification failed:', verifyError.message);
+    if (verifyError.code === 'EAUTH') {
+      throw new Error('Email authentication failed. Please check your EMAIL_USER and EMAIL_PASS credentials.');
+    } else if (verifyError.code === 'ECONNECTION') {
+      throw new Error('Cannot connect to email server. Please check your internet connection.');
+    } else {
+      throw new Error(`Email server configuration error: ${verifyError.message}`);
+    }
   }
 
   const mailOptions = {
-    from: `"Furniture Store" <${emailUser}>`,
-    to: email,
+    from: `"Furniture Store" <${emailUser.trim()}>`,
+    to: email.trim(),
     subject: 'OTP for Account Verification - Furniture Store',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -67,11 +79,17 @@ const sendOTPEmail = async (email, otp) => {
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully to', email, '- Message ID:', info.messageId);
+    console.log('✓ Email sent successfully to', email, '- Message ID:', info.messageId);
     return info;
   } catch (sendError) {
-    console.error('Failed to send email:', sendError);
-    throw new Error(`Failed to send email: ${sendError.message}`);
+    console.error('✗ Failed to send email:', sendError.message);
+    if (sendError.code === 'EAUTH') {
+      throw new Error('Email authentication failed. Please verify your email credentials.');
+    } else if (sendError.code === 'EENVELOPE') {
+      throw new Error('Invalid email address. Please check the recipient email.');
+    } else {
+      throw new Error(`Failed to send email: ${sendError.message}`);
+    }
   }
 };
 
@@ -112,13 +130,14 @@ export const sendOTP = async (req, res) => {
 
     try {
       await sendOTPEmail(email, otp);
-      console.log(`OTP sent successfully to ${email}`);
+      console.log(`✓ OTP sent successfully to ${email}`);
       res.status(200).json({ 
+        success: true,
         message: 'OTP sent to your email',
         email: email
       });
     } catch (emailError) {
-      console.error('Email sending error:', emailError);
+      console.error('✗ Email sending error:', emailError.message);
       // Log the full error for debugging
       console.error('Error details:', {
         message: emailError.message,
@@ -127,9 +146,13 @@ export const sendOTP = async (req, res) => {
         responseCode: emailError.responseCode
       });
       
-      // Return error - don't send OTP in response for security
+      // Return error with helpful message
+      const errorMessage = emailError.message || 'Failed to send OTP email';
       res.status(500).json({ 
-        message: 'Failed to send OTP email. Please try again or contact support.',
+        success: false,
+        message: errorMessage.includes('credentials') || errorMessage.includes('authentication') 
+          ? 'Email service configuration error. Please contact support.'
+          : 'Failed to send OTP email. Please try again in a few moments.',
         error: process.env.NODE_ENV === 'development' ? emailError.message : undefined
       });
     }
