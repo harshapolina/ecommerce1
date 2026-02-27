@@ -18,7 +18,6 @@ const sendOTPEmail = async (email, otp) => {
     throw new Error('Email credentials (EMAIL_USER and EMAIL_PASS) are not configured in environment variables. Please set them in your .env file or deployment environment.');
   }
 
-  // Remove spaces from email password (Gmail app passwords don't have spaces)
   const cleanEmailPass = emailPass.replace(/\s/g, '');
 
   if (cleanEmailPass.length < 16) {
@@ -32,13 +31,11 @@ const sendOTPEmail = async (email, otp) => {
       user: emailUser.trim(),
       pass: cleanEmailPass
     },
-    // Add timeout and connection settings
     connectionTimeout: 10000,
     greetingTimeout: 10000,
     socketTimeout: 10000
   });
 
-  // Verify transporter configuration before sending
   try {
     await transporter.verify();
     console.log('✓ Email server is ready to send messages');
@@ -130,23 +127,13 @@ export const sendOTP = async (req, res) => {
 
     try {
       await sendOTPEmail(email, otp);
-      console.log(`✓ OTP sent successfully to ${email}`);
       res.status(200).json({ 
         success: true,
         message: 'OTP sent to your email',
         email: email
       });
     } catch (emailError) {
-      console.error('✗ Email sending error:', emailError.message);
-      // Log the full error for debugging
-      console.error('Error details:', {
-        message: emailError.message,
-        code: emailError.code,
-        response: emailError.response,
-        responseCode: emailError.responseCode
-      });
-      
-      // Return error with helpful message
+      console.error('Email sending error:', emailError.message);
       const errorMessage = emailError.message || 'Failed to send OTP email';
       res.status(500).json({ 
         success: false,

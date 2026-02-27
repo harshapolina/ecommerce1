@@ -84,11 +84,10 @@ const ProductDetails = () => {
             return;
           }
         } catch (error) {
-          console.error('Failed to load product from server, falling back to demo products.');
+          // Fallback to mock products
         }
       }
 
-      // Fallback to static demo products for original items
       setProduct(mockProducts[id] || mockProducts['1']);
       setLoading(false);
     };
@@ -175,7 +174,6 @@ const ProductDetails = () => {
         </nav>
 
         <div className="product-details-grid">
-          {/* Product Gallery */}
           <div className="product-gallery">
             <div className="main-image">
               <img src={product.image} alt={product.name} />
@@ -194,7 +192,6 @@ const ProductDetails = () => {
             </div>
           </div>
 
-          {/* Product Info */}
           <div className="product-info-section">
             <span className="product-category">{product.category}</span>
             <h1 className="product-title">{product.name}</h1>
@@ -278,7 +275,6 @@ const ProductDetails = () => {
           </div>
         </div>
 
-        {/* Product Tabs */}
         <div className="product-tabs">
           <div className="tabs-header">
             <button 

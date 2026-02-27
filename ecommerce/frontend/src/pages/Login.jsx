@@ -41,14 +41,12 @@ const Login = () => {
         }),
       });
 
-      // Check if response is JSON before parsing
       const contentType = response.headers.get("content-type");
       let data;
       
       if (contentType && contentType.includes("application/json")) {
         data = await response.json();
       } else {
-        // If not JSON, get text response
         const text = await response.text();
         toast.dismiss(loadToast);
         toast.error(text || "Login failed");
@@ -150,8 +148,6 @@ const Login = () => {
   return (
     <div className="auth-page page-enter">
       <div className="auth-container">
-        
-        {/* LEFT SECTION */}
         <div className="auth-left">
           <div className="auth-brand">
             <div className="logo-icon">
@@ -168,15 +164,12 @@ const Login = () => {
           />
         </div>
 
-        {/* RIGHT SECTION */}
         <div className="auth-right">
           <div className="auth-form-wrapper">
             <h2>Sign In</h2>
             <p className="auth-subtitle">Enter your credentials to access your account</p>
 
             <form onSubmit={handleSubmit} className="auth-form">
-              
-              {/* EMAIL */}
               <div className="form-group">
                 <label htmlFor="email">Email Address</label>
                 <div className="input-wrapper">
@@ -192,7 +185,6 @@ const Login = () => {
                 </div>
               </div>
 
-              {/* PASSWORD */}
               <div className="form-group">
                 <label htmlFor="password">Password</label>
                 <div className="input-wrapper">
@@ -225,7 +217,6 @@ const Login = () => {
                 <a href="#" className="forgot-link">Forgot Password?</a>
               </div>
 
-              {/* BUTTON */}
               <button
                 type="submit"
                 className="btn btn-primary auth-btn"

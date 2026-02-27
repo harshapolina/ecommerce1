@@ -59,14 +59,12 @@ const Signup = () => {
         }),
       });
 
-      // Check if response is JSON before parsing
       const contentType = response.headers.get("content-type");
       let data;
       
       if (contentType && contentType.includes("application/json")) {
         data = await response.json();
       } else {
-        // If not JSON, get text response
         const text = await response.text();
         toast.dismiss(loadingToast);
         toast.error(text || "Failed to send OTP");
@@ -181,14 +179,12 @@ const Signup = () => {
         }),
       });
 
-      // Check if response is JSON before parsing
       const contentType = response.headers.get("content-type");
       let data;
       
       if (contentType && contentType.includes("application/json")) {
         data = await response.json();
       } else {
-        // If not JSON, get text response
         const text = await response.text();
         toast.dismiss(loadingToast);
         toast.error(text || "Failed to resend OTP");
@@ -280,7 +276,6 @@ const Signup = () => {
   return (
     <div className="auth-page page-enter">
       <div className="auth-container">
-        {/* LEFT SIDE */}
         <div className="auth-left">
           <div className="auth-brand">
             <div className="logo-icon">
@@ -298,7 +293,6 @@ const Signup = () => {
           />
         </div>
 
-        {/* RIGHT SIDE */}
         <div className="auth-right">
           <div className="auth-form-wrapper">
             {step === 1 ? (
@@ -440,7 +434,6 @@ const Signup = () => {
               <>
                 <h2>Verify OTP</h2>
                 <p className="auth-subtitle">Enter the 6-digit OTP sent to {email}</p>
-
 
                 <form onSubmit={handleVerifyOTP} className="auth-form">
                   <div className="form-group">
