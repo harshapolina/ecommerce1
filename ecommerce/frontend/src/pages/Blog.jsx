@@ -6,6 +6,8 @@ import './Blog.css';
 const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
 
+  const normalizeCategory = (value) => String(value || '').trim().toLowerCase();
+
   const categories = ['All', 'Interior Design', 'Furniture Tips', 'Home Decor', 'Trends'];
 
   const blogPosts = [
@@ -71,9 +73,10 @@ const Blog = () => {
     }
   ];
 
-  const filteredPosts = selectedCategory === 'all' 
-    ? blogPosts 
-    : blogPosts.filter(post => post.category === selectedCategory);
+  const filteredPosts =
+    selectedCategory === 'all'
+      ? blogPosts
+      : blogPosts.filter((post) => normalizeCategory(post.category) === selectedCategory);
 
   return (
     <div className="blog-page page-enter">
@@ -89,8 +92,8 @@ const Blog = () => {
           {categories.map(category => (
             <button
               key={category}
-              className={`filter-btn ${selectedCategory === category.toLowerCase() ? 'active' : ''}`}
-              onClick={() => setSelectedCategory(category.toLowerCase())}
+              className={`filter-btn ${selectedCategory === normalizeCategory(category) ? 'active' : ''}`}
+              onClick={() => setSelectedCategory(normalizeCategory(category))}
             >
               {category}
             </button>
